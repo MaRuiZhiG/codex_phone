@@ -1,7 +1,7 @@
 param(
     [string]$Version = "0.1.0",
     [ValidateSet("Native", "Inno")]
-    [string]$Backend = "Native",
+    [string]$Backend = "Inno",
     [string]$ISCC = ""
 )
 
@@ -50,6 +50,9 @@ if ($Backend -eq "Inno") {
         "/DSourceDir=$Root\dist\CodexPhone" `
         "/DOutputDir=$ReleaseDir" `
         "installer\CodexPhone.iss"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Inno Setup compiler failed with exit code $LASTEXITCODE."
+    }
 
     Write-Host ""
     Write-Host "Installer created:"

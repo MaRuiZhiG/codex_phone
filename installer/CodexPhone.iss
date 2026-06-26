@@ -22,8 +22,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\Codex Phone
 DefaultGroupName=Codex Phone
-DisableProgramGroupPage=yes
-LicenseFile=
+DisableDirPage=no
+DisableProgramGroupPage=no
 OutputDir={#OutputDir}
 OutputBaseFilename=CodexPhoneSetup-{#MyAppVersion}-windows-x64
 SetupIconFile=..\assets\app-icon.ico
@@ -34,6 +34,10 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
+ChangesAssociations=no
+CloseApplications=yes
+RestartApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
