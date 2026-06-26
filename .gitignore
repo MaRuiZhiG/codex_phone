@@ -2,8 +2,15 @@
 __pycache__/
 *.py[cod]
 
+# Build output
+build/
+dist/
+release/
+*.spec.bak
+
 # Virtual environments
 .venv/
+.venv-release/
 venv/
 env/
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import mimetypes
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -37,7 +38,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-static_dir = Path(__file__).resolve().parent.parent / "static"
+if getattr(sys, "frozen", False):
+    app_root = Path(getattr(sys, "_MEIPASS", Path(sys.executable).resolve().parent))
+else:
+    app_root = Path(__file__).resolve().parent.parent
+
+static_dir = app_root / "static"
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
