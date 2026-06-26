@@ -1,0 +1,30 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Runtime logs
+*.log
+.uvicorn-stdout.log
+.uvicorn-stderr.log
+
+# Temporary files
+tmp-*.png
+*.tmp
+*.bak
+
+# Local state and secrets
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db

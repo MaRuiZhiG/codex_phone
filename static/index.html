@@ -1,0 +1,4036 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Codex Phone</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #ffffff;
+      --ink: #111318;
+      --muted: #6f7682;
+      --muted-2: #969daa;
+      --line: rgba(17, 19, 24, 0.065);
+      --line-strong: rgba(17, 19, 24, 0.12);
+      --surface: rgba(255, 255, 255, 0.98);
+      --surface-soft: rgba(247, 248, 251, 0.94);
+      --chip: #f1f3f7;
+      --chip-strong: #eceef3;
+      --blue: #84c3ff;
+      --blue-strong: #2888f5;
+      --blue-soft: rgba(132, 195, 255, 0.18);
+      --aura: rgba(75, 162, 255, 0.14);
+      --shadow: 0 20px 42px rgba(54, 72, 102, 0.1);
+      --shadow-soft: 0 10px 22px rgba(54, 72, 102, 0.07);
+      --shadow-deep: 0 24px 56px rgba(41, 68, 110, 0.12);
+      --radius-xl: 34px;
+      --radius-lg: 28px;
+      --radius-md: 22px;
+      --radius-sm: 18px;
+      font-family: "Segoe UI Variable Display", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 10%, rgba(143, 214, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 88% 20%, rgba(126, 194, 255, 0.11), transparent 24%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 68%, #f2f7ff 100%);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body.chat-active {
+      background:
+        radial-gradient(circle at 50% 86%, rgba(127, 194, 255, 0.64), rgba(127, 194, 255, 0.22) 24%, rgba(255, 255, 255, 0) 52%),
+        radial-gradient(circle at 18% 10%, rgba(139, 220, 255, 0.16), rgba(255,255,255,0) 28%),
+        linear-gradient(180deg, #ffffff 0%, #fbfdff 58%, #eef6ff 100%);
+    }
+
+    body.drawer-open {
+      overflow: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(8px);
+    }
+
+    body::before {
+      width: 220px;
+      height: 220px;
+      top: 82px;
+      right: -68px;
+      background: radial-gradient(circle, rgba(135, 214, 255, 0.28) 0%, rgba(135, 214, 255, 0.08) 42%, rgba(135, 214, 255, 0) 72%);
+      animation: float-orb 9s ease-in-out infinite;
+    }
+
+    body::after {
+      width: 172px;
+      height: 172px;
+      bottom: 132px;
+      left: -56px;
+      background: radial-gradient(circle, rgba(159, 205, 255, 0.18) 0%, rgba(159, 205, 255, 0.05) 44%, rgba(159, 205, 255, 0) 74%);
+      animation: float-orb 12s ease-in-out infinite reverse;
+    }
+
+    button,
+    textarea,
+    input {
+      font: inherit;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      background: none;
+      color: inherit;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app-shell {
+      width: min(100%, 480px);
+      margin: 0 auto;
+      min-height: 100dvh;
+      position: relative;
+      padding: 0 18px 170px;
+      z-index: 1;
+    }
+
+    .app-shell::before {
+      content: "";
+      position: absolute;
+      inset: 72px 10px 120px;
+      border-radius: 42px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.18) 36%, rgba(255,255,255,0));
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.9;
+    }
+
+    .appbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 6;
+      margin: 0 -18px;
+      padding: 16px 18px 12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.9) 68%, rgba(255,255,255,0.2) 92%, rgba(255,255,255,0));
+      backdrop-filter: blur(20px) saturate(1.22);
+      -webkit-backdrop-filter: blur(20px) saturate(1.22);
+    }
+
+    .appbar-left,
+    .appbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 44px;
+    }
+
+    .appbar-right {
+      position: relative;
+      justify-content: flex-end;
+      min-width: auto;
+    }
+
+    .appbar-title {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 18px rgba(77, 112, 168, 0.07);
+      transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .icon-button:active,
+    .composer-plus:active,
+    .send-button:active,
+    .drawer-row:active,
+    .drawer-thread:active,
+    .status-action:active {
+      transform: scale(.965);
+    }
+
+    .icon-button:hover,
+    .composer-plus:hover,
+    .status-action:hover {
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.94), 0 14px 26px rgba(77, 112, 168, 0.12);
+    }
+
+    .model-chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.58);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.94), 0 8px 18px rgba(69, 104, 158, 0.07);
+      cursor: pointer;
+    }
+
+    .model-chip-title {
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .model-chip-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: #cfd7e6;
+      box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+      flex: 0 0 auto;
+      transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .model-chip-dot.online {
+      background: #22b573;
+      box-shadow: 0 0 0 3px rgba(34, 181, 115, 0.16);
+    }
+
+    .model-chip-dot.offline {
+      background: #e25252;
+      box-shadow: 0 0 0 3px rgba(226, 82, 82, 0.16);
+    }
+
+    .model-chip-dot.checking {
+      background: #f1b63b;
+      box-shadow: 0 0 0 3px rgba(241, 182, 59, 0.16);
+    }
+
+    .brand-status-pop {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: 190px;
+      max-width: min(72vw, 260px);
+      padding: 11px 13px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(17, 19, 24, 0.07);
+      box-shadow: 0 18px 34px rgba(49, 74, 118, 0.14);
+      backdrop-filter: blur(18px) saturate(1.12);
+      -webkit-backdrop-filter: blur(18px) saturate(1.12);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 9;
+    }
+
+    .brand-status-pop.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .brand-status-pop::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -7px;
+      width: 14px;
+      height: 14px;
+      transform: translateX(-50%) rotate(45deg);
+      background: rgba(255,255,255,0.96);
+      border-left: 1px solid rgba(17, 19, 24, 0.07);
+      border-top: 1px solid rgba(17, 19, 24, 0.07);
+    }
+
+    .brand-status-head {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-status-bullet {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #cfd7e6;
+      box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16);
+      flex: 0 0 auto;
+    }
+
+    .brand-status-bullet.online {
+      background: #22b573;
+      box-shadow: 0 0 0 3px rgba(34, 181, 115, 0.16);
+    }
+
+    .brand-status-bullet.offline {
+      background: #e25252;
+      box-shadow: 0 0 0 3px rgba(226, 82, 82, 0.16);
+    }
+
+    .brand-status-bullet.checking {
+      background: #f1b63b;
+      box-shadow: 0 0 0 3px rgba(241, 182, 59, 0.16);
+    }
+
+    .brand-status-copy {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .main-scroll {
+      position: relative;
+      z-index: 1;
+      padding-top: 6px;
+    }
+
+    .hero-panel {
+      min-height: calc(100dvh - 290px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 64px 10px 36px;
+      animation: fade-up .35s ease;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 12% 6% auto;
+      height: 220px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(142, 214, 255, 0.24), rgba(142, 214, 255, 0.08) 40%, rgba(142, 214, 255, 0) 72%);
+      filter: blur(8px);
+      z-index: -1;
+      animation: breathe 5.4s ease-in-out infinite;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: clamp(40px, 8vw, 60px);
+      line-height: 1.08;
+      letter-spacing: -0.07em;
+      font-weight: 540;
+      max-width: 7.4em;
+      color: #121724;
+      text-shadow: 0 8px 24px rgba(104, 144, 195, 0.08);
+    }
+
+    .hero-sub {
+      margin: 20px 0 0;
+      max-width: 30ch;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      background: rgba(255,255,255,0.62);
+      padding: 13px 15px;
+      border-radius: 24px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.88), 0 14px 34px rgba(76, 110, 158, 0.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .status-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(17, 19, 24, 0.05);
+      color: var(--muted);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.86), 0 14px 28px rgba(77, 112, 168, 0.08);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .messages-shell {
+      padding: 18px 0 12px;
+      animation: fade-up .28s ease;
+    }
+
+    .thinking-shell {
+      padding: 2px 0 16px;
+      animation: fade-up .22s ease;
+    }
+
+    .thinking-card {
+      margin-right: auto;
+      max-width: min(88%, 100%);
+      padding: 13px 15px 14px;
+      border-radius: 24px;
+      border: 1px solid rgba(58, 146, 255, 0.14);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,250,255,0.9));
+      box-shadow: 0 18px 36px rgba(83, 137, 202, 0.12);
+      backdrop-filter: blur(18px) saturate(1.18);
+      -webkit-backdrop-filter: blur(18px) saturate(1.18);
+    }
+
+    .thinking-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .thinking-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .thinking-pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #54a8ff;
+      box-shadow: 0 0 0 0 rgba(84, 168, 255, 0.36);
+      animation: thinking-pulse 1.8s ease-out infinite;
+      flex: 0 0 auto;
+    }
+
+    .thinking-time {
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .thinking-steps {
+      display: grid;
+      gap: 8px;
+    }
+
+    .thinking-step {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr);
+      align-items: start;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .thinking-step-dot {
+      width: 8px;
+      height: 8px;
+      margin-top: 6px;
+      border-radius: 999px;
+      background: rgba(58, 146, 255, 0.34);
+    }
+
+    .thinking-step-text {
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    .history-loader-anchor {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+      min-height: 34px;
+    }
+
+    .history-loader-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(17, 19, 24, 0.06);
+      color: var(--muted);
+      box-shadow: var(--shadow-soft);
+      font-size: 12px;
+      letter-spacing: -0.01em;
+      transform: translateY(var(--pull-shift, 0px)) scale(var(--pull-scale, 1));
+      transition:
+        transform 0.14s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
+    }
+
+    .history-loader-pill.loading {
+      color: var(--ink);
+    }
+
+    .history-loader-pill.pulling,
+    .history-loader-pill.holding {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.92);
+      border-color: rgba(58, 146, 255, 0.16);
+      box-shadow: 0 16px 34px rgba(58, 146, 255, 0.12);
+    }
+
+    .history-loader-pill.holding {
+      box-shadow: 0 20px 40px rgba(58, 146, 255, 0.16);
+    }
+
+    .history-loader-gauge {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+      background: conic-gradient(
+        #3a92ff calc(var(--pull-progress, 0) * 1turn),
+        rgba(17, 19, 24, 0.10) 0
+      );
+    }
+
+    .history-loader-gauge::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: inset 0 0 0 1px rgba(17, 19, 24, 0.05);
+    }
+
+    .history-loader-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      line-height: 1.15;
+      text-align: left;
+    }
+
+    .history-loader-title {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .history-loader-sub {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+    }
+
+    .history-loader-spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(17, 19, 24, 0.16);
+      border-top-color: #3a92ff;
+      animation: spin 0.9s linear infinite;
+      flex: 0 0 auto;
+    }
+
+    .message-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .message-card {
+      max-width: min(88%, 100%);
+      padding: 14px 16px;
+      border-radius: 26px;
+      line-height: 1.62;
+      box-shadow: 0 16px 32px rgba(70, 98, 145, 0.09);
+      border: 1px solid rgba(17, 19, 24, 0.04);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(249,251,255,0.86));
+      backdrop-filter: blur(14px) saturate(1.1);
+      -webkit-backdrop-filter: blur(14px) saturate(1.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .message-card.user {
+      margin-left: auto;
+      background:
+        linear-gradient(180deg, rgba(235, 246, 255, 0.98), rgba(225, 240, 255, 0.92));
+      box-shadow: 0 18px 36px rgba(80, 137, 210, 0.13);
+    }
+
+    .message-card.assistant,
+    .message-card.system {
+      margin-right: auto;
+    }
+
+    .message-card.assistant {
+      border-color: rgba(48, 144, 255, 0.08);
+      box-shadow: 0 18px 38px rgba(80, 137, 210, 0.1);
+    }
+
+    .message-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 54%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.44), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .message-card.assistant::after,
+    .message-card.system::after {
+      content: "";
+      position: absolute;
+      inset: 10px auto 10px 0;
+      width: 3px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(67, 157, 255, 0.62), rgba(67, 157, 255, 0.08));
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .message-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .message-role {
+      color: var(--ink);
+      font-weight: 650;
+    }
+
+    .message-text {
+      font-size: 14.5px;
+      color: #19202b;
+      word-break: break-word;
+    }
+
+    .message-text .md-block {
+      animation: message-block-in .42s ease both;
+      animation-delay: calc(var(--block-index, 0) * 42ms);
+    }
+
+    .message-card.assistant .message-text .md-block + .md-block,
+    .message-card.system .message-text .md-block + .md-block {
+      margin-top: 10px;
+    }
+
+    .message-card.assistant .message-text .md-block-shell,
+    .message-card.system .message-text .md-block-shell {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(245,249,255,0.58));
+      border: 1px solid rgba(67, 157, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 10px 20px rgba(79, 122, 193, 0.07);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .message-card.assistant .message-text .md-block-shell:active,
+    .message-card.system .message-text .md-block-shell:active {
+      transform: scale(.995);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 8px 16px rgba(79, 122, 193, 0.06);
+    }
+
+    .message-text > *:first-child {
+      margin-top: 0;
+    }
+
+    .message-text > *:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-text p {
+      margin: 0 0 12px;
+      line-height: 1.78;
+    }
+
+    .message-text .message-block {
+      position: relative;
+    }
+
+    .message-text .message-block.collapsed {
+      max-height: 580px;
+      overflow: hidden;
+    }
+
+    .message-text .message-block.collapsed .message-block-fade {
+      display: block;
+    }
+
+    .message-text .message-block-fade {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 96px;
+      background: linear-gradient(180deg, rgba(248, 251, 255, 0), rgba(248, 251, 255, 0.96) 66%, rgba(248, 251, 255, 1));
+      pointer-events: none;
+    }
+
+    .message-text .message-expand-row {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 12px;
+    }
+
+    .message-text .message-expand-btn {
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(29, 120, 242, 0.12);
+      background: rgba(239, 246, 255, 0.84);
+      color: #176edc;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.88), 0 8px 16px rgba(68, 110, 182, 0.08);
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
+    }
+
+    .message-rich-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 1px 0 11px;
+      padding: 0 2px;
+    }
+
+    .message-rich-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .message-rich-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: rgba(39, 132, 255, 0.1);
+      border: 1px solid rgba(39, 132, 255, 0.12);
+      color: #1b72de;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .message-rich-hint {
+      color: #6c7789;
+      font-size: 10.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .message-rich-copy {
+      min-height: 27px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(17, 19, 24, 0.06);
+      background: rgba(255,255,255,0.76);
+      color: #475367;
+      font-size: 10.5px;
+      font-weight: 600;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.92), 0 8px 16px rgba(68, 110, 182, 0.08);
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease, color .16s ease;
+    }
+
+    .message-rich-copy.copied {
+      color: #176edc;
+      border-color: rgba(29, 120, 242, 0.16);
+      background: rgba(239, 246, 255, 0.92);
+    }
+
+    .message-text h1,
+    .message-text h2,
+    .message-text h3,
+    .message-text h4 {
+      margin: 0;
+      line-height: 1.28;
+      letter-spacing: -0.04em;
+      color: #101723;
+    }
+
+    .message-text h1 {
+      font-size: 25px;
+    }
+
+    .message-text h2 {
+      font-size: 21px;
+    }
+
+    .message-text h3 {
+      font-size: 18px;
+    }
+
+    .message-text h4 {
+      font-size: 16px;
+    }
+
+    .message-text .md-block-heading {
+      padding: 2px 2px 0;
+    }
+
+    .message-card.assistant .message-text .md-block-heading,
+    .message-card.system .message-text .md-block-heading {
+      position: relative;
+    }
+
+    .message-card.assistant .message-text .md-block-heading::after,
+    .message-card.system .message-text .md-block-heading::after {
+      content: "";
+      display: block;
+      width: 54px;
+      height: 3px;
+      margin-top: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(56, 149, 255, 0.82), rgba(56, 149, 255, 0.18));
+    }
+
+    .message-text ul,
+    .message-text ol {
+      margin: 0 0 14px;
+      padding-left: 20px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .message-text li {
+      line-height: 1.72;
+      padding-left: 2px;
+    }
+
+    .message-text li::marker {
+      color: #5a8fda;
+    }
+
+    .message-text li > ul,
+    .message-text li > ol {
+      margin: 8px 0 2px;
+    }
+
+    .message-text .md-block-list ul,
+    .message-text .md-block-list ol {
+      margin: 0;
+    }
+
+    .message-text blockquote {
+      margin: 14px 0;
+      padding: 12px 14px;
+      border-left: 3px solid rgba(48, 144, 255, 0.34);
+      border-radius: 0 18px 18px 0;
+      background: rgba(239, 246, 255, 0.68);
+      color: #465161;
+    }
+
+    .message-text .md-block-quote blockquote {
+      margin: 0;
+    }
+
+    .message-text blockquote p {
+      margin-bottom: 10px;
+    }
+
+    .message-text hr {
+      margin: 16px 0;
+      border: 0;
+      border-top: 1px solid rgba(17, 19, 24, 0.08);
+    }
+
+    .message-text .code-block {
+      margin: 16px 0;
+      overflow: hidden;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(20, 29, 43, 0.98), rgba(28, 40, 58, 0.98));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 16px 30px rgba(30, 45, 66, 0.18);
+      position: relative;
+    }
+
+    .message-text .code-block-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 13px 0;
+    }
+
+    .message-text .code-block-lang {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(236, 244, 255, 0.86);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .message-text .code-block-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .message-text .code-copy-btn,
+    .message-text .code-toggle-btn {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: #f1f7ff;
+      font-size: 11px;
+      font-weight: 600;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: transform .16s ease, background .16s ease, border-color .16s ease, color .16s ease;
+    }
+
+    .message-text .code-copy-btn.copied,
+    .message-text .code-toggle-btn.active {
+      background: rgba(81, 174, 255, 0.2);
+      color: #dff2ff;
+      border-color: rgba(81, 174, 255, 0.28);
+    }
+
+    .message-text pre {
+      margin: 0;
+      padding: 14px 15px;
+      overflow-x: auto;
+      border-radius: 0 0 20px 20px;
+      background: transparent;
+      color: #eef5ff;
+    }
+
+    .message-text .code-block.collapsed pre {
+      max-height: 236px;
+      overflow: hidden auto;
+    }
+
+    .message-text .code-block-fade {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 42px;
+      height: 66px;
+      background: linear-gradient(180deg, rgba(28, 40, 58, 0), rgba(28, 40, 58, 0.98));
+      pointer-events: none;
+    }
+
+    .message-text .code-block.collapsed .code-block-fade {
+      display: block;
+    }
+
+    .message-text pre code {
+      display: block;
+      font-size: 12.5px;
+      line-height: 1.68;
+      white-space: pre;
+      color: inherit;
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    .message-text code {
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 0.9em;
+      padding: 0.16em 0.44em;
+      border-radius: 10px;
+      background: rgba(35, 52, 80, 0.08);
+      color: #174a86;
+    }
+
+    .message-text strong {
+      color: #101723;
+      font-weight: 700;
+    }
+
+    .message-text em {
+      color: #435065;
+    }
+
+    .message-text a {
+      color: #1d78f2;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(29, 120, 242, 0.24);
+    }
+
+    .message-text a:hover {
+      color: #0e61d0;
+      border-bottom-color: rgba(14, 97, 208, 0.36);
+    }
+
+    .message-text .table-scroll {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 1px rgba(17, 19, 24, 0.06);
+      background: rgba(255,255,255,0.75);
+    }
+
+    .message-text .table-block {
+      margin: 16px 0;
+      overflow: hidden;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.82);
+      box-shadow: 0 14px 26px rgba(71, 101, 145, 0.1), inset 0 1px 0 rgba(255,255,255,0.82);
+      border: 1px solid rgba(17, 19, 24, 0.05);
+    }
+
+    .message-text .table-block-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 13px;
+      background: linear-gradient(180deg, rgba(246,249,254,0.96), rgba(240,245,252,0.86));
+      border-bottom: 1px solid rgba(17, 19, 24, 0.05);
+    }
+
+    .message-text .table-block-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #34527c;
+      background: rgba(29, 120, 242, 0.08);
+      border: 1px solid rgba(29, 120, 242, 0.12);
+    }
+
+    .message-text .table-block-hint {
+      color: #627088;
+      font-size: 11px;
+    }
+
+    .message-rich-copy:active,
+    .message-text .message-expand-btn:active,
+    .message-text .code-copy-btn:active,
+    .message-text .code-toggle-btn:active {
+      transform: scale(.97);
+    }
+
+    .message-text table {
+      width: 100%;
+      min-width: 420px;
+      margin: 14px 0;
+      border-collapse: collapse;
+      overflow: hidden;
+      background: transparent;
+      margin: 0;
+    }
+
+    .message-text th,
+    .message-text td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(17, 19, 24, 0.06);
+      vertical-align: top;
+      line-height: 1.62;
+    }
+
+    .message-text th {
+      font-size: 13px;
+      color: #435065;
+      background: rgba(242, 246, 252, 0.92);
+    }
+
+    .message-text tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .message-images {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .message-images.single {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .message-image-frame {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(212, 224, 242, 0.6);
+      box-shadow: inset 0 0 0 1px rgba(17, 19, 24, 0.05), 0 12px 24px rgba(75, 103, 146, 0.1);
+      aspect-ratio: 1 / 1;
+    }
+
+    .message-image-frame.single {
+      aspect-ratio: auto;
+      max-height: 280px;
+    }
+
+    .message-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .message-image-frame.single .message-image {
+      height: auto;
+      max-height: 280px;
+      object-fit: contain;
+      background: rgba(234, 241, 251, 0.85);
+    }
+
+    .empty-history {
+      margin-top: 20px;
+      padding: 18px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .composer-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px 18px calc(env(safe-area-inset-bottom) + 14px);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(241,247,255,0.48) 24%, rgba(230,240,255,0.92) 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .composer-wrap {
+      width: min(100%, 444px);
+      margin: 0 auto;
+      position: relative;
+      padding: 9px 11px 9px;
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.96));
+      box-shadow: 0 18px 42px rgba(83, 137, 202, 0.16), inset 0 1px 0 rgba(255,255,255,0.9);
+      border: 1px solid rgba(17, 19, 24, 0.04);
+      overflow: hidden;
+      pointer-events: auto;
+    }
+
+    .composer-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .attachment-strip {
+      display: none;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0 10px 2px;
+      margin-bottom: 2px;
+    }
+
+    .attachment-strip.has-items {
+      display: flex;
+    }
+
+    .attachment-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .thumb {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      flex: 0 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--chip);
+      box-shadow: 0 16px 28px rgba(71, 101, 145, 0.12);
+    }
+
+    .thumb img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: white;
+      background: rgba(17, 19, 24, 0.72);
+    }
+
+    .composer-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .composer-input-stack {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .composer-right-stack {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .composer-plus {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      flex: 0 0 auto;
+      background: rgba(244, 248, 255, 0.9);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.94), 0 8px 18px rgba(77, 112, 168, 0.07);
+      transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+      overflow: hidden;
+    }
+
+    .composer-plus input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      display: block;
+    }
+
+    .composer-field {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      resize: none;
+      max-height: 136px;
+      min-height: 44px;
+      padding: 9px 8px 7px;
+      background: transparent;
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.42;
+    }
+
+    .composer-field::placeholder {
+      color: var(--muted-2);
+    }
+
+    .model-launcher {
+      min-width: 82px;
+      height: 40px;
+      padding: 0 11px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #24272f;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(17, 19, 24, 0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72), 0 8px 18px rgba(77, 112, 168, 0.07);
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;
+      white-space: nowrap;
+    }
+
+    .model-launcher:hover,
+    .model-launcher.open {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 10px 20px rgba(83, 137, 202, 0.12);
+    }
+
+    .appbar-model-launcher {
+      min-width: 88px;
+      height: 42px;
+      padding: 0 13px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 18px rgba(83, 137, 202, 0.1), inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .model-launcher-main {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      font-feature-settings: "tnum" 1;
+    }
+
+    .model-launcher-name {
+      font-size: 14px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-weight: 600;
+    }
+
+    .model-launcher-effort {
+      font-size: 10px;
+      line-height: 1;
+      color: var(--muted);
+    }
+
+    .model-launcher-caret {
+      color: var(--muted);
+      transition: transform .18s ease;
+    }
+
+    .model-launcher.open .model-launcher-caret {
+      transform: rotate(180deg);
+    }
+
+    .send-button {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #0f2238;
+      background: linear-gradient(145deg, #dff3ff 0%, #c2e6ff 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.78), 0 14px 28px rgba(76, 129, 197, 0.14);
+      transition: transform .18s ease, opacity .18s ease;
+    }
+
+    .send-button svg {
+      transition: opacity .18s ease, transform .22s ease;
+    }
+
+    .send-button.disabled {
+      opacity: 0.55;
+    }
+
+    .send-button.loading,
+    .send-button.loading.disabled {
+      opacity: 1;
+      background: linear-gradient(135deg, #b7dcff 0%, #dff2ff 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 20px 38px rgba(76, 129, 197, 0.22);
+    }
+
+    .send-button.loading svg {
+      opacity: 0;
+      transform: scale(0.78);
+    }
+
+    .send-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+    }
+
+    .send-button.loading .send-loader {
+      opacity: 1;
+    }
+
+    .send-loader-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #0f2238;
+      opacity: 0.35;
+      transform: translateY(0) scale(0.92);
+      animation: send-loader-wave 1.05s ease-in-out infinite;
+    }
+
+    .send-loader-dot:nth-child(2) {
+      animation-delay: .14s;
+    }
+
+    .send-loader-dot:nth-child(3) {
+      animation-delay: .28s;
+    }
+
+    .model-panel {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: min(360px, calc(100vw - 28px));
+      padding: 16px 16px 14px;
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,249,255,0.96));
+      border: 1px solid rgba(17, 19, 24, 0.06);
+      box-shadow: 0 30px 58px rgba(48, 73, 116, 0.2);
+      backdrop-filter: blur(24px) saturate(1.16);
+      -webkit-backdrop-filter: blur(24px) saturate(1.16);
+      transform-origin: top right;
+      animation: fade-up .18s ease;
+      z-index: 7;
+    }
+
+    .model-panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .model-panel-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .model-panel-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .model-panel-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: rgba(17, 19, 24, 0.04);
+      flex: 0 0 auto;
+    }
+
+    .model-panel-section + .model-panel-section {
+      margin-top: 14px;
+    }
+
+    .model-panel-label {
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .model-choice-list {
+      display: grid;
+      gap: 8px;
+      max-height: 198px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .model-choice-item {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(17, 19, 24, 0.04);
+      border: 1px solid transparent;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .model-choice-item.active {
+      background: rgba(127, 194, 255, 0.20);
+      border-color: rgba(58, 146, 255, 0.22);
+    }
+
+    .model-choice-name {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      word-break: break-word;
+    }
+
+    .model-choice-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .effort-chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .effort-chip {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(17, 19, 24, 0.04);
+      border: 1px solid transparent;
+      transition: background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .effort-chip.active {
+      color: #0f2238;
+      background: rgba(127, 194, 255, 0.20);
+      border-color: rgba(58, 146, 255, 0.22);
+    }
+
+    .model-panel-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .model-panel-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .model-apply-btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #d7eeff;
+      color: #0f2238;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+
+    .model-apply-btn.disabled {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    @keyframes send-loader-wave {
+      0%, 100% {
+        opacity: 0.3;
+        transform: translateY(0) scale(0.92);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateY(-4px) scale(1);
+      }
+    }
+
+    @keyframes thinking-pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(84, 168, 255, 0.34);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(84, 168, 255, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(84, 168, 255, 0);
+      }
+    }
+
+    .composer-meta {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .composer-meta span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(19, 24, 34, 0.3);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+      z-index: 8;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer-panel {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: min(84vw, 342px);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.99), rgba(247,250,255,0.98));
+      transform: translateX(-104%);
+      transition: transform .26s ease;
+      z-index: 9;
+      box-shadow: 0 28px 60px rgba(17, 19, 24, 0.16);
+      display: flex;
+      flex-direction: column;
+      padding: 18px 16px calc(env(safe-area-inset-bottom) + 16px);
+      border-right: 1px solid rgba(17, 19, 24, 0.05);
+    }
+
+    .drawer-panel.open {
+      transform: translateX(0);
+    }
+
+    .drawer-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .drawer-brand {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+    }
+
+    .drawer-primary {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .drawer-row {
+      width: 100%;
+      min-height: 58px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+
+    .drawer-row.primary {
+      background: var(--chip-strong);
+    }
+
+    .drawer-row.secondary {
+      background: transparent;
+    }
+
+    .drawer-row-label {
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .drawer-section {
+      display: none;
+    }
+
+    .drawer-threads {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+      overflow-y: auto;
+      padding-right: 2px;
+      min-height: 0;
+      flex: 1;
+    }
+
+    .drawer-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .drawer-group + .drawer-group {
+      margin-top: 10px;
+    }
+
+    .drawer-group-title {
+      padding: 2px 4px 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .drawer-project {
+      padding: 10px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(245,248,253,0.92), rgba(240,245,251,0.82));
+      border: 1px solid rgba(17, 19, 24, 0.05);
+      display: grid;
+      gap: 8px;
+      box-shadow: 0 12px 24px rgba(73, 99, 140, 0.06);
+    }
+
+    .drawer-project-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 4px 6px 2px;
+    }
+
+    .drawer-project-summary {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .drawer-project-name {
+      font-size: 15px;
+      color: var(--ink);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .drawer-project-path {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .drawer-project-threads {
+      display: grid;
+      gap: 8px;
+    }
+
+    .drawer-project-threads.collapsed {
+      display: none;
+    }
+
+    .drawer-project-toggle {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(17, 19, 24, 0.06);
+      transition: background .18s ease, transform .18s ease, color .18s ease;
+    }
+
+    .drawer-project-toggle svg {
+      transition: transform .18s ease;
+    }
+
+    .drawer-project-toggle.collapsed svg {
+      transform: rotate(-90deg);
+    }
+
+    .drawer-thread {
+      width: 100%;
+      padding: 14px 14px;
+      border-radius: 18px;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: background .18s ease, border-color .18s ease;
+    }
+
+    .drawer-project .drawer-thread {
+      padding: 12px 12px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.76);
+    }
+
+    .drawer-thread.active {
+      background: linear-gradient(180deg, rgba(235,244,255,0.95), rgba(229,239,253,0.88));
+      border-color: rgba(17, 19, 24, 0.06);
+      box-shadow: 0 12px 22px rgba(77, 112, 168, 0.08);
+    }
+
+    .drawer-thread-name {
+      font-size: 15px;
+      color: var(--ink);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .drawer-thread-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .drawer-empty {
+      padding: 20px 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .drawer-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(17, 19, 24, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .drawer-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .drawer-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #dcecff 0%, #9cc9ff 100%);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .drawer-avatar-inner {
+      width: 36px;
+      height: 36px;
+      border-radius: inherit;
+      background: #ffffff;
+      color: #3a92ff;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .drawer-profile-name {
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .drawer-profile-sub {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(0.98);
+        opacity: 0.76;
+      }
+      50% {
+        transform: scale(1.04);
+        opacity: 1;
+      }
+    }
+
+    @keyframes float-orb {
+      0%, 100% {
+        transform: translate3d(0, 0, 0);
+      }
+      50% {
+        transform: translate3d(0, 10px, 0);
+      }
+    }
+
+    @keyframes message-block-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 960px) {
+      .app-shell {
+        width: min(100%, 1180px);
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+
+      .main-scroll {
+        width: min(100%, 720px);
+        margin: 0 auto;
+      }
+
+      .composer-wrap {
+        width: min(100%, 760px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer-panel" id="drawerPanel" aria-hidden="true">
+      <div class="drawer-topbar">
+      <div class="drawer-brand">Codex Phone</div>
+      <button class="icon-button" id="closeDrawerBtn" type="button" aria-label="关闭会话栏">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="drawer-primary">
+      <button class="drawer-row primary" id="drawerNewThreadBtn" type="button">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 18.5V20h1.5l9.6-9.6-1.5-1.5L4 18.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+          <path d="M13 6.5l1.5-1.5a1.4 1.4 0 0 1 2 0l1.5 1.5a1.4 1.4 0 0 1 0 2L16.5 10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="drawer-row-label">发起新对话</span>
+      </button>
+    </div>
+
+    <div class="drawer-section">最近</div>
+    <div class="drawer-threads" id="threadDrawerList"></div>
+
+    <div class="drawer-footer">
+      <div class="drawer-profile">
+        <div class="drawer-avatar"><div class="drawer-avatar-inner">CP</div></div>
+        <div>
+          <div class="drawer-profile-name">本地 Codex</div>
+          <div class="drawer-profile-sub" id="tokenBox">已连接</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app-shell">
+    <header class="appbar">
+      <div class="appbar-left">
+        <button class="icon-button" id="menuBtn" type="button" aria-label="打开会话栏">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="appbar-title">
+        <button class="model-chip" id="brandChip" type="button" aria-label="Codex Phone，正在检查连接" aria-expanded="false">
+          <span class="model-chip-title">Codex Phone</span>
+          <span class="model-chip-dot checking" id="brandStatusDot" aria-hidden="true"></span>
+          <div class="brand-status-pop" id="brandStatusPop" role="status" aria-live="polite">
+            <div class="brand-status-head">
+              <span class="brand-status-bullet checking" id="brandStatusBullet" aria-hidden="true"></span>
+              <span id="brandStatusLabel">正在检查连接</span>
+            </div>
+            <div class="brand-status-copy" id="brandStatusCopy">正在确认后端和桌面 Codex 状态。</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="appbar-right">
+        <button id="modelPickerBtn" class="model-launcher appbar-model-launcher" type="button" aria-label="打开 Codex 模型设置">
+          <span class="model-launcher-main">
+            <span class="model-launcher-name" id="modelPickerName">5.4</span>
+            <span class="model-launcher-effort" id="modelPickerEffort">高</span>
+          </span>
+          <svg class="model-launcher-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="model-panel hidden" id="modelPanel">
+          <div class="model-panel-header">
+            <div>
+              <div class="model-panel-title">切换 Codex 模型</div>
+              <div class="model-panel-sub" id="modelPanelSub">从当前 provider 动态读取可选模型。</div>
+            </div>
+            <button class="model-panel-close" id="closeModelPanelBtn" type="button" aria-label="关闭模型面板">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="model-panel-section">
+            <div class="model-panel-label">模型</div>
+            <div class="model-choice-list" id="modelChoiceList"></div>
+          </div>
+
+          <div class="model-panel-section">
+            <div class="model-panel-label">智能程度</div>
+            <div class="effort-chip-row" id="effortChipRow"></div>
+          </div>
+
+          <div class="model-panel-actions">
+            <div class="model-panel-note" id="modelPanelNote">会修改你电脑上的 Codex 配置，通常从下一轮对话开始生效。</div>
+            <button id="applyModelBtn" class="model-apply-btn disabled" type="button">应用到 Codex</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-scroll">
+      <section class="hero-panel" id="heroPanel">
+        <h1 class="hero-title" id="heroTitle">今天想让 Codex 帮你做什么？</h1>
+      </section>
+
+      <section class="messages-shell hidden" id="messagesShell">
+        <div class="history-loader-anchor hidden" id="historyLoaderAnchor"></div>
+        <div class="message-list" id="historyList"></div>
+      </section>
+
+      <section class="thinking-shell hidden" id="thinkingShell"></section>
+
+    </main>
+  </div>
+
+  <footer class="composer-dock">
+    <div class="composer-wrap">
+      <div class="attachment-strip" id="attachmentStrip"></div>
+      <div class="composer-row">
+        <label class="composer-plus" aria-label="添加图片">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="fileInput" type="file" accept="image/*,.heic,.heif" multiple>
+        </label>
+
+        <div class="composer-input-stack">
+          <textarea id="messageInput" class="composer-field" rows="1" placeholder="问问 Codex"></textarea>
+        </div>
+
+        <button id="sendBtn" class="send-button disabled" type="button" aria-label="发送消息">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5v14M8.5 8.5 12 5l3.5 3.5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="send-loader" aria-hidden="true">
+            <span class="send-loader-dot"></span>
+            <span class="send-loader-dot"></span>
+            <span class="send-loader-dot"></span>
+          </span>
+        </button>
+      </div>
+
+      <div class="composer-meta">
+        <span id="composerThreadMeta">等待选择线程</span>
+        <span id="composerStatusMeta">本地直连</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const token = new URLSearchParams(location.search).get("token") || "";
+    const PULL_LOAD_DISTANCE = 96;
+    const PULL_LOAD_HOLD_MS = 900;
+    const state = {
+      token,
+      threads: [],
+      currentThreadId: "",
+      attachments: [],
+      isReadingAttachments: false,
+      attachmentReadPromise: null,
+      projectCollapsed: (() => {
+        try {
+          return JSON.parse(localStorage.getItem("codex-phone-project-collapsed") || "{}");
+        } catch {
+          return {};
+        }
+      })(),
+      isRunning: false,
+      isSending: false,
+      isInterrupting: false,
+      interruptRequested: false,
+      watch: null,
+      pollTimer: null,
+      drawerOpen: false,
+      lastMessages: [],
+      historyPageSize: 15,
+      visibleMessageCount: 15,
+      loadingOlderMessages: false,
+      renderedThreadId: "",
+      pullActive: false,
+      pullTriggered: false,
+      pullStartY: 0,
+      pullDistance: 0,
+      pullProgress: 0,
+      pullHoldProgress: 0,
+      pullHoldStartAt: 0,
+      pullHoldTimer: null,
+      pullPointerId: null,
+      modelPanelOpen: false,
+      modelConfig: null,
+      draftModel: "",
+      draftEffort: "",
+      applyingModel: false,
+      connectionState: token ? "checking" : "offline",
+      brandStatusOpen: false,
+      liveStatus: null,
+      thinkingTimer: null,
+      codeBlockMap: {},
+      codeBlockCounter: 0,
+      messageBodyMap: {},
+      messageBodyCounter: 0,
+    };
+
+    const tokenBox = document.getElementById("tokenBox");
+    const brandChip = document.getElementById("brandChip");
+    const brandStatusDot = document.getElementById("brandStatusDot");
+    const brandStatusPop = document.getElementById("brandStatusPop");
+    const brandStatusBullet = document.getElementById("brandStatusBullet");
+    const brandStatusLabel = document.getElementById("brandStatusLabel");
+    const brandStatusCopy = document.getElementById("brandStatusCopy");
+    const heroTitle = document.getElementById("heroTitle");
+    const historyList = document.getElementById("historyList");
+    const historyLoaderAnchor = document.getElementById("historyLoaderAnchor");
+    const messagesShell = document.getElementById("messagesShell");
+    const thinkingShell = document.getElementById("thinkingShell");
+    const heroPanel = document.getElementById("heroPanel");
+    const threadDrawerList = document.getElementById("threadDrawerList");
+    const attachmentStrip = document.getElementById("attachmentStrip");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const drawerPanel = document.getElementById("drawerPanel");
+    const messageInput = document.getElementById("messageInput");
+    const fileInput = document.getElementById("fileInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const modelPickerBtn = document.getElementById("modelPickerBtn");
+    const modelPickerName = document.getElementById("modelPickerName");
+    const modelPickerEffort = document.getElementById("modelPickerEffort");
+    const modelPanel = document.getElementById("modelPanel");
+    const modelPanelSub = document.getElementById("modelPanelSub");
+    const modelChoiceList = document.getElementById("modelChoiceList");
+    const effortChipRow = document.getElementById("effortChipRow");
+    const modelPanelNote = document.getElementById("modelPanelNote");
+    const applyModelBtn = document.getElementById("applyModelBtn");
+    const composerThreadMeta = document.getElementById("composerThreadMeta");
+    const composerStatusMeta = document.getElementById("composerStatusMeta");
+
+    function maskToken(value) {
+      if (!value) return "缺少 token";
+      if (value.length <= 12) return `已连接 ${value}`;
+      return `已连接 ${value.slice(0, 6)}...${value.slice(-4)}`;
+    }
+
+    function setConnectionState(nextState, message = "") {
+      const normalized = nextState === "online" || nextState === "offline" ? nextState : "checking";
+      state.connectionState = normalized;
+      brandStatusDot.classList.toggle("online", normalized === "online");
+      brandStatusDot.classList.toggle("offline", normalized === "offline");
+      brandStatusDot.classList.toggle("checking", normalized === "checking");
+      brandStatusBullet.classList.toggle("online", normalized === "online");
+      brandStatusBullet.classList.toggle("offline", normalized === "offline");
+      brandStatusBullet.classList.toggle("checking", normalized === "checking");
+
+      const label = normalized === "online"
+        ? "Codex 状态正常"
+        : normalized === "offline"
+          ? "后端或鉴权失败"
+          : "桌面 Codex 状态未确认";
+      const detail = message ? `，${message}` : "";
+      brandChip.setAttribute("aria-label", `Codex Phone，${label}${detail}`);
+      brandChip.title = `${label}${message ? `：${message}` : ""}`;
+      brandStatusLabel.textContent = normalized === "online"
+        ? "Codex 正常"
+        : normalized === "offline"
+          ? "后端或鉴权失败"
+          : "后端在线，等待桌面状态";
+      brandStatusCopy.textContent = message || (
+        normalized === "online"
+          ? "桌面 Codex 状态接口已正常返回。"
+          : normalized === "offline"
+            ? "当前无法正常调用本地后端或 token 校验未通过。"
+            : "前端已经连到后端，但还没有确认桌面 Codex 的状态接口。"
+      );
+    }
+
+    function markBackendReachable(message = "") {
+      if (state.connectionState !== "online") {
+        setConnectionState("checking", message || "后端在线，等待确认 Codex 状态");
+      }
+    }
+
+    function setBrandStatusOpen(open) {
+      state.brandStatusOpen = Boolean(open);
+      brandStatusPop.classList.toggle("show", state.brandStatusOpen);
+      brandChip.setAttribute("aria-expanded", state.brandStatusOpen ? "true" : "false");
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"]/g, (s) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+      }[s]));
+    }
+
+    function escapeAttribute(value) {
+      return String(value || "").replace(/[&<>"]/g, (s) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+      }[s]));
+    }
+
+    function safeHref(value) {
+      const text = String(value || "").trim();
+      if (!text) return "";
+      if (/^(https?:|mailto:)/i.test(text)) return text;
+      return "";
+    }
+
+    function registerCodeBlock(source) {
+      const id = `code-${++state.codeBlockCounter}`;
+      const text = String(source || "");
+      state.codeBlockMap[id] = {
+        text,
+        lineCount: text ? text.split("\n").length : 0,
+      };
+      return id;
+    }
+
+    function registerMessageBody(source) {
+      const id = `body-${++state.messageBodyCounter}`;
+      state.messageBodyMap[id] = String(source || "");
+      return id;
+    }
+
+    function codeLanguageLabel(value) {
+      const lang = String(value || "").trim().toLowerCase();
+      if (!lang) return "Code";
+      const labels = {
+        js: "JavaScript",
+        javascript: "JavaScript",
+        ts: "TypeScript",
+        typescript: "TypeScript",
+        py: "Python",
+        python: "Python",
+        sh: "Shell",
+        bash: "Bash",
+        zsh: "Shell",
+        ps1: "PowerShell",
+        powershell: "PowerShell",
+        json: "JSON",
+        html: "HTML",
+        css: "CSS",
+        sql: "SQL",
+        yaml: "YAML",
+        yml: "YAML",
+        md: "Markdown",
+        markdown: "Markdown",
+        xml: "XML",
+      };
+      return labels[lang] || lang.toUpperCase();
+    }
+
+    function shouldCollapseCodeBlock(text) {
+      const source = String(text || "");
+      const lineCount = source ? source.split("\n").length : 0;
+      return lineCount > 12 || source.length > 720;
+    }
+
+    function shouldCollapseMessageText(text) {
+      const source = String(text || "").trim();
+      if (!source) return false;
+      const lineCount = source.split("\n").length;
+      return source.length > 1200 || lineCount > 26;
+    }
+
+    function isAssistantLikeMessage(message) {
+      const role = String(message?.role || "").toLowerCase();
+      return role === "assistant" || role === "system";
+    }
+
+    function renderInlineMarkdown(input) {
+      const source = String(input || "");
+      const tokens = [];
+      let html = escapeHtml(source);
+
+      html = html.replace(/`([^`\n]+)`/g, (_, code) => {
+        const token = `__CODE_TOKEN_${tokens.length}__`;
+        tokens.push(`<code>${code}</code>`);
+        return token;
+      });
+
+      html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g, (_, label, href) => {
+        const safe = safeHref(href);
+        if (!safe) return escapeHtml(label);
+        return `<a href="${escapeAttribute(safe)}" target="_blank" rel="noreferrer">${label}</a>`;
+      });
+
+      html = html.replace(/(^|[\s(])(https?:\/\/[^\s<]+)/g, (_, prefix, href) => {
+        const safe = safeHref(href);
+        if (!safe) return `${prefix}${href}`;
+        return `${prefix}<a href="${escapeAttribute(safe)}" target="_blank" rel="noreferrer">${href}</a>`;
+      });
+
+      html = html
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/__([^_]+)__/g, "<strong>$1</strong>")
+        .replace(/(^|[\s(])\*([^*\n]+)\*(?=$|[\s).,!?:;])/g, "$1<em>$2</em>")
+        .replace(/(^|[\s(])_([^_\n]+)_(?=$|[\s).,!?:;])/g, "$1<em>$2</em>")
+        .replace(/~~([^~]+)~~/g, "<del>$1</del>");
+
+      tokens.forEach((token, index) => {
+        html = html.replace(`__CODE_TOKEN_${index}__`, token);
+      });
+
+      return html;
+    }
+
+    function parseMarkdownTable(lines, startIndex) {
+      const headerLine = lines[startIndex] || "";
+      const dividerLine = lines[startIndex + 1] || "";
+      if (!headerLine.includes("|") || !dividerLine.includes("|")) return null;
+
+      const dividerCells = dividerLine.split("|").map((cell) => cell.trim()).filter(Boolean);
+      if (!dividerCells.length || dividerCells.some((cell) => !/^:?-{3,}:?$/.test(cell))) {
+        return null;
+      }
+
+      const readCells = (line) => {
+        let normalized = line.trim();
+        if (normalized.startsWith("|")) normalized = normalized.slice(1);
+        if (normalized.endsWith("|")) normalized = normalized.slice(0, -1);
+        return normalized.split("|").map((cell) => cell.trim());
+      };
+
+      const headers = readCells(headerLine);
+      const rows = [];
+      let cursor = startIndex + 2;
+      while (cursor < lines.length) {
+        const line = lines[cursor] || "";
+        if (!line.trim() || !line.includes("|")) break;
+        rows.push(readCells(line));
+        cursor += 1;
+      }
+
+      return {
+        html: `
+          <div class="table-block">
+            <div class="table-block-top">
+              <span class="table-block-label">表格</span>
+              <span class="table-block-hint">左右滑动查看完整内容</span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>${headers.map((cell) => `<th>${renderInlineMarkdown(cell)}</th>`).join("")}</tr>
+                </thead>
+                <tbody>
+                  ${rows.map((cells) => `<tr>${cells.map((cell) => `<td>${renderInlineMarkdown(cell)}</td>`).join("")}</tr>`).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `,
+        nextIndex: cursor,
+      };
+    }
+
+    function renderMarkdown(input) {
+      const lines = String(input || "").replace(/\r\n?/g, "\n").split("\n");
+      const blocks = [];
+      let index = 0;
+
+      const pushParagraph = (rows) => {
+        if (!rows.length) return;
+        const text = rows.join("\n");
+        blocks.push(`<div class="md-block md-block-paragraph" style="--block-index:${blocks.length}"><div class="md-block-shell"><p>${renderInlineMarkdown(text).replace(/\n/g, "<br>")}</p></div></div>`);
+      };
+
+      while (index < lines.length) {
+        const raw = lines[index];
+        const trimmed = raw.trim();
+
+        if (!trimmed) {
+          index += 1;
+          continue;
+        }
+
+        const fence = raw.match(/^```([\w-]+)?\s*$/);
+        if (fence) {
+          const lang = String(fence[1] || "").trim();
+          const rows = [];
+          index += 1;
+          while (index < lines.length && !/^```/.test(lines[index])) {
+            rows.push(lines[index]);
+            index += 1;
+          }
+          if (index < lines.length) index += 1;
+          const codeText = rows.join("\n");
+          const codeId = registerCodeBlock(codeText);
+          const langLabel = escapeHtml(codeLanguageLabel(lang));
+          const collapsed = shouldCollapseCodeBlock(codeText);
+          blocks.push(`
+            <div class="md-block md-block-code" style="--block-index:${blocks.length}">
+              <div class="code-block${collapsed ? " collapsed" : ""}" data-code-block="${escapeAttribute(codeId)}">
+                <div class="code-block-top">
+                  <span class="code-block-lang">${langLabel}</span>
+                  <span class="code-block-actions">
+                    ${collapsed ? `<button class="code-toggle-btn active" data-toggle-code="${escapeAttribute(codeId)}" type="button">展开</button>` : ""}
+                    <button class="code-copy-btn" data-copy-code="${escapeAttribute(codeId)}" type="button">复制</button>
+                  </span>
+                </div>
+                <div class="code-block-fade" aria-hidden="true"></div>
+                <pre><code>${escapeHtml(codeText)}</code></pre>
+              </div>
+            </div>
+          `);
+          continue;
+        }
+
+        const table = parseMarkdownTable(lines, index);
+        if (table) {
+          blocks.push(`<div class="md-block md-block-table" style="--block-index:${blocks.length}">${table.html}</div>`);
+          index = table.nextIndex;
+          continue;
+        }
+
+        const heading = raw.match(/^(#{1,4})\s+(.+)$/);
+        if (heading) {
+          const level = Math.min(4, heading[1].length);
+          blocks.push(`<div class="md-block md-block-heading" style="--block-index:${blocks.length}"><h${level}>${renderInlineMarkdown(heading[2].trim())}</h${level}></div>`);
+          index += 1;
+          continue;
+        }
+
+        if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+          blocks.push(`<div class="md-block md-block-rule" style="--block-index:${blocks.length}"><hr></div>`);
+          index += 1;
+          continue;
+        }
+
+        if (/^>\s?/.test(raw)) {
+          const rows = [];
+          while (index < lines.length && /^>\s?/.test(lines[index])) {
+            rows.push(lines[index].replace(/^>\s?/, ""));
+            index += 1;
+          }
+          blocks.push(`<div class="md-block md-block-quote" style="--block-index:${blocks.length}"><div class="md-block-shell"><blockquote>${renderMarkdown(rows.join("\n"))}</blockquote></div></div>`);
+          continue;
+        }
+
+        const unordered = raw.match(/^[-*+]\s+(.+)$/);
+        if (unordered) {
+          const items = [];
+          while (index < lines.length) {
+            const match = lines[index].match(/^[-*+]\s+(.+)$/);
+            if (!match) break;
+            items.push(`<li>${renderInlineMarkdown(match[1])}</li>`);
+            index += 1;
+          }
+          blocks.push(`<div class="md-block md-block-list" style="--block-index:${blocks.length}"><div class="md-block-shell"><ul>${items.join("")}</ul></div></div>`);
+          continue;
+        }
+
+        const ordered = raw.match(/^\d+\.\s+(.+)$/);
+        if (ordered) {
+          const items = [];
+          while (index < lines.length) {
+            const match = lines[index].match(/^\d+\.\s+(.+)$/);
+            if (!match) break;
+            items.push(`<li>${renderInlineMarkdown(match[1])}</li>`);
+            index += 1;
+          }
+          blocks.push(`<div class="md-block md-block-list" style="--block-index:${blocks.length}"><div class="md-block-shell"><ol>${items.join("")}</ol></div></div>`);
+          continue;
+        }
+
+        const paragraphRows = [];
+        while (index < lines.length) {
+          const line = lines[index];
+          const text = line.trim();
+          if (!text) break;
+          if (/^```/.test(line)) break;
+          if (/^(#{1,4})\s+/.test(line)) break;
+          if (/^>\s?/.test(line)) break;
+          if (/^[-*+]\s+/.test(line)) break;
+          if (/^\d+\.\s+/.test(line)) break;
+          if (/^(-{3,}|\*{3,}|_{3,})$/.test(text)) break;
+          if (parseMarkdownTable(lines, index)) break;
+          paragraphRows.push(text);
+          index += 1;
+        }
+        pushParagraph(paragraphRows);
+      }
+
+      return blocks.join("");
+    }
+
+    function renderMessageText(message) {
+      const text = String(message?.text || "");
+      if (!text.trim()) return "";
+      const collapsed = shouldCollapseMessageText(text);
+      const blockId = `msg-${message?.id || message?.timestamp || Math.random().toString(36).slice(2)}`.replace(/[^a-zA-Z0-9_-]/g, "-");
+      const bodyId = registerMessageBody(text);
+      const richTopbar = isAssistantLikeMessage(message) ? `
+        <div class="message-rich-topbar">
+          <span class="message-rich-meta">
+            <span class="message-rich-badge">AI 回答</span>
+            <span class="message-rich-hint">已自动优化为更清晰的阅读排版</span>
+          </span>
+          <button class="message-rich-copy" data-copy-message="${escapeAttribute(bodyId)}" type="button">复制回答</button>
+        </div>
+      ` : "";
+      return `
+        <div class="message-text">
+          ${richTopbar}
+          <div class="message-block${collapsed ? " collapsed" : ""}" data-message-block="${escapeAttribute(blockId)}">
+            ${renderMarkdown(text)}
+            <div class="message-block-fade" aria-hidden="true"></div>
+          </div>
+          ${collapsed ? `<div class="message-expand-row"><button class="message-expand-btn" data-toggle-message="${escapeAttribute(blockId)}" type="button">展开更多</button></div>` : ""}
+        </div>
+      `;
+    }
+
+    async function copyCodeBlock(button) {
+      const codeId = button?.getAttribute("data-copy-code") || "";
+      const row = state.codeBlockMap[codeId];
+      const text = row?.text || "";
+      if (!text) {
+        setMeta("没有找到这段代码内容。");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = button.textContent || "复制";
+        button.textContent = "已复制";
+        button.classList.add("copied");
+        setTimeout(() => {
+          button.textContent = original;
+          button.classList.remove("copied");
+        }, 1400);
+        setMeta("代码已复制到剪贴板。");
+      } catch (error) {
+        setMeta("复制失败，请长按代码块手动复制。");
+      }
+    }
+
+    async function copyMessageBody(button) {
+      const bodyId = button?.getAttribute("data-copy-message") || "";
+      const text = state.messageBodyMap[bodyId] || "";
+      if (!text) {
+        setMeta("没有找到这条回答内容。");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = button.textContent || "复制回答";
+        button.textContent = "已复制";
+        button.classList.add("copied");
+        setTimeout(() => {
+          button.textContent = original;
+          button.classList.remove("copied");
+        }, 1400);
+        setMeta("整段回答已复制。");
+      } catch (error) {
+        setMeta("复制失败，请长按消息手动复制。");
+      }
+    }
+
+    function toggleCodeBlock(button) {
+      const codeId = button?.getAttribute("data-toggle-code") || "";
+      const block = codeId ? historyList.querySelector(`[data-code-block="${CSS.escape(codeId)}"]`) : null;
+      if (!block) return;
+      const collapsed = block.classList.toggle("collapsed");
+      button.textContent = collapsed ? "展开" : "收起";
+      button.classList.toggle("active", collapsed);
+    }
+
+    function toggleMessageBlock(button) {
+      const blockId = button?.getAttribute("data-toggle-message") || "";
+      const block = blockId ? historyList.querySelector(`[data-message-block="${CSS.escape(blockId)}"]`) : null;
+      if (!block) return;
+      const collapsed = block.classList.toggle("collapsed");
+      button.textContent = collapsed ? "展开更多" : "收起内容";
+    }
+
+    function shortPath(value) {
+      if (!value) return "未绑定工作目录";
+      return value.split(/[\\/]/).filter(Boolean).slice(-2).join(" / ");
+    }
+
+    function formatTime(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString("zh-CN", {
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function formatElapsed(value) {
+      const totalSeconds = Math.max(0, Math.floor(Number(value || 0) / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      if (hours > 0) {
+        return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      }
+      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function normalizeThinkingText(value) {
+      return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function effortLabel(value) {
+      return {
+        none: "关闭",
+        minimal: "极低",
+        low: "低",
+        medium: "中",
+        high: "高",
+        xhigh: "超高",
+      }[String(value || "").toLowerCase()] || String(value || "").toUpperCase();
+    }
+
+    function shortModelLabel(value) {
+      const text = String(value || "").trim();
+      if (!text) return "模型";
+      if (text.startsWith("gpt-")) return text.slice(4);
+      if (text.startsWith("deepseek-")) return text.replace("deepseek-", "DS ");
+      if (text.length <= 9) return text;
+      return `${text.slice(0, 8)}…`;
+    }
+
+    function currentThread() {
+      return state.threads.find((thread) => thread.id === state.currentThreadId) || null;
+    }
+
+    function isNearBottom() {
+      return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 140;
+    }
+
+    function isLooseChatThread(thread) {
+      const parts = splitPath(thread.cwd || "");
+      if (!parts.length) return true;
+
+      const lowered = parts.map((part) => part.toLowerCase());
+      if (lowered.includes("new-chat")) return true;
+      if (lowered.some((part) => part.startsWith("files-mentioned-by-the-user"))) return true;
+
+      const codexIndex = lowered.lastIndexOf("codex");
+      if (codexIndex >= 0 && parts.length >= codexIndex + 2) {
+        const dateLike = parts[codexIndex + 1] || "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateLike)) return true;
+      }
+
+      return false;
+    }
+
+    function projectGroupInfo(thread) {
+      if (isLooseChatThread(thread)) {
+        return {
+          key: "__loose__",
+          title: "对话",
+          path: "",
+          kind: "loose",
+        };
+      }
+
+      const parts = splitPath(thread.cwd || "");
+      const title = parts[parts.length - 1] || "未命名项目";
+      return {
+        key: String(thread.cwd || title),
+        title,
+        path: String(thread.cwd || ""),
+        kind: "project",
+      };
+    }
+
+    function renderDrawerThread(thread, compact = false) {
+      const meta = compact ? formatTime(thread.updatedAt || "") : `${shortPath(thread.cwd || "")}<br>${formatTime(thread.updatedAt || "")}`;
+      return `
+        <button class="drawer-thread ${thread.id === state.currentThreadId ? "active" : ""}" data-thread-id="${thread.id}" type="button">
+          <div class="drawer-thread-name">${escapeHtml(thread.name || "Untitled")}</div>
+          <div class="drawer-thread-meta">${escapeHtml(meta).replace(/&lt;br&gt;/g, "<br>")}</div>
+        </button>
+      `;
+    }
+
+    function attachmentUrl(value) {
+      if (!value) return "";
+      if (/^data:/i.test(value) || /^https?:/i.test(value)) return value;
+      return `/codex/attachment?token=${encodeURIComponent(state.token)}&path=${encodeURIComponent(value)}`;
+    }
+
+    function normalizeAttachments(items = []) {
+      return items.map((item, index) => {
+        if (typeof item === "string") {
+          const parts = item.split(/[\\/]/);
+          const name = parts[parts.length - 1] || `image-${index + 1}`;
+          return { name, src: attachmentUrl(item) };
+        }
+
+        const src = item.dataUrl || item.src || "";
+        if (!src) return null;
+        return {
+          name: item.name || `image-${index + 1}`,
+          src: attachmentUrl(src),
+        };
+      }).filter(Boolean);
+    }
+
+    function visibleMessages(messages = []) {
+      const count = Math.max(state.historyPageSize, state.visibleMessageCount);
+      return messages.slice(Math.max(0, messages.length - count));
+    }
+
+    function hasOlderMessages(messages = state.lastMessages) {
+      return visibleMessages(messages).length < messages.length;
+    }
+
+    function canPullOlderMessages() {
+      return !state.drawerOpen && !state.loadingOlderMessages && !messagesShell.classList.contains("hidden") && hasOlderMessages();
+    }
+
+    function clearPullHoldTimer() {
+      if (state.pullHoldTimer) {
+        clearInterval(state.pullHoldTimer);
+        state.pullHoldTimer = null;
+      }
+    }
+
+    function resetPullGesture() {
+      clearPullHoldTimer();
+      state.pullActive = false;
+      state.pullTriggered = false;
+      state.pullStartY = 0;
+      state.pullDistance = 0;
+      state.pullProgress = 0;
+      state.pullHoldProgress = 0;
+      state.pullHoldStartAt = 0;
+      state.pullPointerId = null;
+    }
+
+    function beginPullGesture(startY, pointerId = null) {
+      if (state.pullActive) return false;
+      if (!canPullOlderMessages() || window.scrollY > 6) return false;
+
+      state.pullActive = true;
+      state.pullTriggered = false;
+      state.pullStartY = startY;
+      state.pullDistance = 0;
+      state.pullProgress = 0;
+      state.pullHoldProgress = 0;
+      state.pullHoldStartAt = 0;
+      state.pullPointerId = pointerId;
+      clearPullHoldTimer();
+      renderHistoryLoader();
+      return true;
+    }
+
+    function startPullHold() {
+      if (state.pullHoldTimer || state.pullTriggered) return;
+
+      state.pullHoldStartAt = performance.now();
+      state.pullHoldTimer = setInterval(() => {
+        const elapsed = performance.now() - state.pullHoldStartAt;
+        state.pullHoldProgress = Math.max(0, Math.min(1, elapsed / PULL_LOAD_HOLD_MS));
+        renderHistoryLoader();
+        if (state.pullHoldProgress >= 1) {
+          clearPullHoldTimer();
+          state.pullTriggered = true;
+          loadOlderMessages().finally(() => {
+            resetPullGesture();
+            renderHistoryLoader();
+          });
+        }
+      }, 40);
+    }
+
+    function renderHistoryLoader(messages = state.lastMessages) {
+      const showLoader = state.pullActive || (messages.length > 0 && hasOlderMessages(messages));
+      historyLoaderAnchor.classList.toggle("hidden", !showLoader);
+      if (!showLoader) {
+        historyLoaderAnchor.innerHTML = "";
+        return;
+      }
+
+      const pulling = state.pullActive && !state.loadingOlderMessages;
+      const holding = pulling && state.pullProgress >= 1;
+      const loading = state.loadingOlderMessages;
+      const displayProgress = loading
+        ? 0
+        : holding
+          ? state.pullHoldProgress
+          : state.pullProgress;
+      const remainingSeconds = Math.max(0, (PULL_LOAD_HOLD_MS - (state.pullHoldProgress * PULL_LOAD_HOLD_MS)) / 1000);
+      const title = loading
+        ? "正在加载更早对话..."
+        : holding
+          ? "稳住，正在解锁旧消息"
+          : pulling
+            ? "继续下拉"
+            : "上拉查看更早对话";
+      const sub = loading
+        ? "马上把更早的内容接上来"
+        : holding
+          ? `继续保持 ${remainingSeconds.toFixed(1)} 秒`
+          : pulling
+            ? "拉满后停住约 1 秒"
+            : "到顶部后下拉并停住约 1 秒";
+      const pillClass = loading
+        ? "loading"
+        : holding
+          ? "holding"
+          : pulling
+            ? "pulling"
+            : "";
+      const shiftPx = Math.min(26, state.pullDistance * 0.22);
+      const scale = 1 + Math.min(0.06, state.pullDistance / 1600);
+
+      historyLoaderAnchor.innerHTML = `
+        <div
+          class="history-loader-pill ${pillClass}"
+          style="--pull-shift:${shiftPx.toFixed(1)}px; --pull-scale:${scale.toFixed(3)}; --pull-progress:${Math.max(0, Math.min(1, displayProgress)).toFixed(3)};"
+        >
+          ${loading ? `<span class="history-loader-spinner" aria-hidden="true"></span>` : `<span class="history-loader-gauge" aria-hidden="true"></span>`}
+          <span class="history-loader-copy">
+            <span class="history-loader-title">${title}</span>
+            <span class="history-loader-sub">${sub}</span>
+          </span>
+        </div>
+      `;
+    }
+
+    function scrollToLatest() {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "auto" });
+      });
+    }
+
+    function currentModelSelection() {
+      return state.modelConfig?.current || { model: "", effort: "high", providerName: "" };
+    }
+
+    function modelDraftDirty() {
+      const current = currentModelSelection();
+      return state.draftModel !== (current.model || "") || state.draftEffort !== (current.effort || "");
+    }
+
+    function setModelPanel(open) {
+      state.modelPanelOpen = Boolean(open);
+      modelPanel.classList.toggle("hidden", !state.modelPanelOpen);
+      modelPickerBtn.classList.toggle("open", state.modelPanelOpen);
+    }
+
+    function renderModelPicker() {
+      const current = currentModelSelection();
+      modelPickerName.textContent = shortModelLabel(current.model || "");
+      modelPickerEffort.textContent = effortLabel(current.effort || "high");
+
+      if (!state.modelConfig) {
+        modelPanelSub.textContent = "正在读取当前 provider 模型列表...";
+        modelChoiceList.innerHTML = "";
+        effortChipRow.innerHTML = "";
+        applyModelBtn.classList.add("disabled");
+        return;
+      }
+
+      const providerName = current.providerName || current.provider || "当前 Codex provider";
+      modelPanelSub.textContent = `${providerName}${current.baseUrl ? ` · ${current.baseUrl}` : ""}`;
+
+      modelChoiceList.innerHTML = (state.modelConfig.models || []).map((model) => `
+        <button class="model-choice-item ${model === state.draftModel ? "active" : ""}" data-model-choice="${escapeHtml(model)}" type="button">
+          <div class="model-choice-name">${escapeHtml(model)}</div>
+          <div class="model-choice-meta">${model === current.model ? "当前正在使用" : "由当前 provider 动态返回"}</div>
+        </button>
+      `).join("");
+
+      effortChipRow.innerHTML = (state.modelConfig.efforts || []).map((effort) => `
+        <button class="effort-chip ${effort === state.draftEffort ? "active" : ""}" data-effort-choice="${escapeHtml(effort)}" type="button">
+          ${escapeHtml(effortLabel(effort))}
+        </button>
+      `).join("");
+
+      modelChoiceList.querySelectorAll("[data-model-choice]").forEach((node) => {
+        node.addEventListener("click", () => {
+          state.draftModel = node.getAttribute("data-model-choice") || state.draftModel;
+          renderModelPicker();
+        });
+      });
+
+      effortChipRow.querySelectorAll("[data-effort-choice]").forEach((node) => {
+        node.addEventListener("click", () => {
+          state.draftEffort = node.getAttribute("data-effort-choice") || state.draftEffort;
+          renderModelPicker();
+        });
+      });
+
+      modelPanelNote.textContent = state.applyingModel
+        ? "正在写回本机 Codex 配置..."
+        : "会修改你电脑上的 Codex 配置，通常从下一轮对话开始生效。";
+      applyModelBtn.textContent = state.applyingModel ? "应用中..." : "应用到 Codex";
+      applyModelBtn.classList.toggle("disabled", state.applyingModel || !modelDraftDirty());
+    }
+
+    function autoResizeComposer() {
+      messageInput.style.height = "46px";
+      messageInput.style.height = `${Math.min(messageInput.scrollHeight, 140)}px`;
+    }
+
+    function setComposerRunning(running) {
+      state.isRunning = Boolean(running);
+      if (!state.isRunning) {
+        state.isSending = false;
+        state.isInterrupting = false;
+        state.interruptRequested = false;
+      }
+      sendBtn.classList.toggle("loading", state.isRunning);
+      sendBtn.setAttribute("aria-busy", state.isRunning ? "true" : "false");
+      sendBtn.setAttribute("aria-label", state.isRunning ? "中断对话" : "发送消息");
+      updateSendState();
+    }
+
+    function updateSendState() {
+      const disabled =
+        state.isReadingAttachments ||
+        state.isInterrupting ||
+        (state.isSending && state.interruptRequested) ||
+        (!state.isRunning && !messageInput.value.trim() && !state.attachments.length);
+      sendBtn.classList.toggle("disabled", disabled);
+      sendBtn.disabled = disabled;
+    }
+
+    function setMeta(message) {
+      composerStatusMeta.textContent = message;
+    }
+
+    function setDrawer(open) {
+      state.drawerOpen = open;
+      document.body.classList.toggle("drawer-open", open);
+      drawerBackdrop.classList.toggle("open", open);
+      drawerPanel.classList.toggle("open", open);
+      drawerPanel.setAttribute("aria-hidden", open ? "false" : "true");
+    }
+
+    function clearPollTimer() {
+      if (state.pollTimer) {
+        clearTimeout(state.pollTimer);
+        state.pollTimer = null;
+      }
+    }
+
+    async function interruptConversation() {
+      if (!state.isRunning || state.isInterrupting) return;
+
+      if (state.isSending) {
+        state.interruptRequested = true;
+        updateSendState();
+        setMeta("已记录中断请求，等消息真正进入 Codex 后会立刻停止。");
+        return;
+      }
+
+      state.interruptRequested = false;
+      state.isInterrupting = true;
+      updateSendState();
+      setMeta("正在尝试中断这轮 Codex 对话...");
+
+      try {
+        await api("/codex/interrupt", {
+          method: "POST",
+          body: JSON.stringify({
+            threadId: state.watch?.threadId || state.currentThreadId,
+          }),
+        });
+        const status = await loadStatus();
+        if (status && status.status === "running") schedulePoll();
+      } catch (error) {
+        state.isInterrupting = false;
+        updateSendState();
+        setMeta(`中断失败: ${error.message}`);
+      }
+    }
+
+    function schedulePoll() {
+      clearPollTimer();
+      setComposerRunning(true);
+      state.pollTimer = setTimeout(async () => {
+        try {
+          const status = await loadStatus();
+          await loadHistory();
+          if (state.interruptRequested && status && status.status === "running") {
+            await interruptConversation();
+          } else if (status && (status.status === "running" || state.isSending || state.interruptRequested)) {
+            schedulePoll();
+          }
+        } catch (error) {
+          setMeta(`同步失败: ${error.message}`);
+        }
+      }, 1800);
+    }
+
+    async function api(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+      headers.set("x-mobile-typer-token", state.token);
+      if (!headers.has("content-type") && options.body) headers.set("content-type", "application/json");
+      let res;
+      try {
+        res = await fetch(path, { ...options, headers });
+      } catch (error) {
+        setConnectionState("offline", "本地服务不可达");
+        throw error;
+      }
+
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.ok === false) {
+        setConnectionState("offline", json.message || json.detail?.message || "请求失败");
+        throw new Error(json.message || json.detail?.message || "request failed");
+      }
+
+      if (!String(path || "").startsWith("/codex/status")) {
+        markBackendReachable("后端在线，等待确认 Codex 状态");
+      }
+      return json;
+    }
+
+    async function loadModelConfig() {
+      const data = await api("/codex/models");
+      state.modelConfig = data;
+      state.draftModel = data.current?.model || "";
+      state.draftEffort = data.current?.effort || "high";
+      renderModelPicker();
+      return data;
+    }
+
+    async function applyModelConfig() {
+      if (!state.modelConfig || state.applyingModel || !modelDraftDirty()) return;
+
+      state.applyingModel = true;
+      renderModelPicker();
+      try {
+        const data = await api("/codex/models", {
+          method: "POST",
+          body: JSON.stringify({
+            model: state.draftModel,
+            effort: state.draftEffort,
+          }),
+        });
+        state.modelConfig = data;
+        state.draftModel = data.current?.model || state.draftModel;
+        state.draftEffort = data.current?.effort || state.draftEffort;
+        setMeta(`已切换为 ${data.current?.model || state.draftModel} / ${effortLabel(data.current?.effort || state.draftEffort)}`);
+        setModelPanel(false);
+      } catch (error) {
+        setMeta(`模型切换失败: ${error.message}`);
+      } finally {
+        state.applyingModel = false;
+        renderModelPicker();
+      }
+    }
+
+    async function loadOlderMessages() {
+      if (state.loadingOlderMessages || !hasOlderMessages()) return;
+
+      state.loadingOlderMessages = true;
+      const previousHeight = document.documentElement.scrollHeight;
+      renderHistoryLoader();
+
+      await new Promise((resolve) => setTimeout(resolve, 360));
+
+      state.visibleMessageCount = Math.min(
+        state.visibleMessageCount + state.historyPageSize,
+        state.lastMessages.length,
+      );
+      state.loadingOlderMessages = false;
+      renderHistory(state.lastMessages, {
+        preserveScroll: true,
+        previousHeight,
+      });
+    }
+
+    function applyPullResistance(deltaY) {
+      const limited = Math.max(0, deltaY);
+      return Math.min(132, limited * 0.56);
+    }
+
+    function updatePullGesture(clientY) {
+      if (!state.pullActive || state.pullTriggered || !canPullOlderMessages()) return;
+
+      const rawDelta = clientY - state.pullStartY;
+      if (rawDelta <= 0) {
+        clearPullHoldTimer();
+        state.pullDistance = 0;
+        state.pullProgress = 0;
+        state.pullHoldProgress = 0;
+        renderHistoryLoader();
+        return;
+      }
+
+      state.pullDistance = applyPullResistance(rawDelta);
+      state.pullProgress = Math.max(0, Math.min(1, state.pullDistance / PULL_LOAD_DISTANCE));
+
+      if (state.pullProgress >= 1) {
+        startPullHold();
+      } else {
+        clearPullHoldTimer();
+        state.pullHoldProgress = 0;
+        state.pullHoldStartAt = 0;
+      }
+
+      renderHistoryLoader();
+    }
+
+    function renderThreadSummary() {
+      const active = currentThread();
+      if (!active) {
+        composerThreadMeta.textContent = "等待选择线程";
+        return;
+      }
+      composerThreadMeta.textContent = `${shortPath(active.cwd || "")} · ${formatTime(active.updatedAt || "")}`;
+    }
+
+    function splitPath(value) {
+      return String(value || "").split(/[\\/]/).filter(Boolean);
+    }
+
+    function isLooseChatThread(thread) {
+      const parts = splitPath(thread.cwd || "");
+      if (!parts.length) return true;
+
+      const lowered = parts.map((part) => part.toLowerCase());
+      if (lowered.includes("new-chat")) return true;
+      if (lowered.some((part) => part.startsWith("files-mentioned-by-the-user"))) return true;
+
+      const codexIndex = lowered.lastIndexOf("codex");
+      if (codexIndex >= 0 && parts.length >= codexIndex + 2) {
+        const dateLike = parts[codexIndex + 1] || "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateLike)) return true;
+      }
+
+      return false;
+    }
+
+    function projectGroupInfo(thread) {
+      if (isLooseChatThread(thread)) {
+        return {
+          key: "__loose__",
+          title: "对话",
+          path: "",
+          kind: "loose",
+        };
+      }
+
+      const parts = splitPath(thread.cwd || "");
+      const title = parts[parts.length - 1] || "未命名项目";
+      return {
+        key: String(thread.cwd || title),
+        title,
+        path: String(thread.cwd || ""),
+        kind: "project",
+      };
+    }
+
+    function renderDrawerThread(thread, compact = false) {
+      const meta = compact
+        ? formatTime(thread.updatedAt || "")
+        : `${shortPath(thread.cwd || "")}<br>${formatTime(thread.updatedAt || "")}`;
+      return `
+        <button class="drawer-thread ${thread.id === state.currentThreadId ? "active" : ""}" data-thread-id="${thread.id}" type="button">
+          <div class="drawer-thread-name">${escapeHtml(thread.name || "Untitled")}</div>
+          <div class="drawer-thread-meta">${escapeHtml(meta).replace(/&lt;br&gt;/g, "<br>")}</div>
+        </button>
+      `;
+    }
+
+    function saveProjectCollapsedState() {
+      try {
+        localStorage.setItem("codex-phone-project-collapsed", JSON.stringify(state.projectCollapsed || {}));
+      } catch {}
+    }
+
+    function isProjectCollapsed(groupKey) {
+      return Boolean(state.projectCollapsed && state.projectCollapsed[groupKey]);
+    }
+
+    function toggleProjectCollapsed(groupKey) {
+      state.projectCollapsed[groupKey] = !isProjectCollapsed(groupKey);
+      saveProjectCollapsedState();
+      renderThreadDrawer();
+    }
+
+    function renderThreadDrawer() {
+      if (!state.threads.length) {
+        threadDrawerList.innerHTML = `<div class="drawer-empty">还没有发现可切换的线程。确认 Codex Desktop 已启动，并且当前目录下已有 .codex 会话文件。</div>`;
+        return;
+      }
+
+      const grouped = state.threads.reduce((acc, thread) => {
+        const group = projectGroupInfo(thread);
+        if (!acc[group.key]) {
+          acc[group.key] = {
+            ...group,
+            threads: [],
+          };
+        }
+        acc[group.key].threads.push(thread);
+        return acc;
+      }, {});
+
+      const groups = Object.values(grouped);
+      const looseGroup = groups.find((group) => group.kind === "loose");
+      const projectGroups = groups
+        .filter((group) => group.kind === "project")
+        .sort((a, b) => (b.threads[0]?.mtimeMs || 0) - (a.threads[0]?.mtimeMs || 0));
+
+      threadDrawerList.innerHTML = [
+        looseGroup ? `
+          <section class="drawer-group">
+            <div class="drawer-group-title">对话</div>
+            <div class="drawer-project-threads">
+              ${looseGroup.threads.map((thread) => renderDrawerThread(thread)).join("")}
+            </div>
+          </section>
+        ` : "",
+        projectGroups.length ? `
+          <section class="drawer-group">
+            <div class="drawer-group-title">项目</div>
+            ${projectGroups.map((group) => `
+              <div class="drawer-project">
+                <div class="drawer-project-head">
+                  <div class="drawer-project-summary">
+                    <div class="drawer-project-name">${escapeHtml(group.title)}</div>
+                    <div class="drawer-project-path">${escapeHtml(group.path)}</div>
+                  </div>
+                  <button
+                    class="drawer-project-toggle ${isProjectCollapsed(group.key) ? "collapsed" : ""}"
+                    data-project-toggle="${escapeHtml(group.key)}"
+                    type="button"
+                    aria-label="${isProjectCollapsed(group.key) ? "展开项目对话" : "收起项目对话"}"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="drawer-project-threads ${isProjectCollapsed(group.key) ? "collapsed" : ""}">
+                  ${group.threads.map((thread) => renderDrawerThread(thread, true)).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </section>
+        ` : "",
+      ].filter(Boolean).join("");
+
+      threadDrawerList.querySelectorAll("[data-thread-id]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          const threadId = node.getAttribute("data-thread-id");
+          await selectThread(threadId);
+        });
+      });
+
+      threadDrawerList.querySelectorAll("[data-project-toggle]").forEach((node) => {
+        node.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const groupKey = node.getAttribute("data-project-toggle");
+          if (!groupKey) return;
+          toggleProjectCollapsed(groupKey);
+        });
+      });
+    }
+
+    function renderAttachmentPreview() {
+      document.body.classList.toggle("chat-active", Boolean(state.attachments.length || messageInput.value.trim() || state.lastMessages.length));
+      if (!state.attachments.length) {
+        attachmentStrip.classList.remove("has-items");
+        attachmentStrip.innerHTML = "";
+        if (!messageInput.value.trim()) {
+          setMeta(state.token ? "本地直连" : "缺少 token");
+        }
+        updateSendState();
+        return;
+      }
+
+      attachmentStrip.classList.add("has-items");
+      attachmentStrip.innerHTML = state.attachments.map((item, index) => `
+        <div class="thumb">
+          <button class="thumb-remove" data-attachment-remove="${index}" type="button">×</button>
+          <img src="${item.dataUrl}" alt="${escapeHtml(item.name || "image")}">
+        </div>
+      `).join("");
+
+      attachmentStrip.querySelectorAll("[data-attachment-remove]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const index = Number(node.getAttribute("data-attachment-remove"));
+          state.attachments.splice(index, 1);
+          renderAttachmentPreview();
+        });
+      });
+
+      setMeta(`已选择 ${state.attachments.length} 张图片，发送后会一起交给 Codex。`);
+      updateSendState();
+    }
+
+    function thinkingSteps(status = state.liveStatus) {
+      const rows = Array.isArray(status?.steps) ? status.steps : [];
+      const filtered = [];
+      const seen = new Set();
+
+      for (const row of rows) {
+        const label = String(row?.label || "").toLowerCase();
+        const text = normalizeThinkingText(row?.text || "");
+        if (!text) continue;
+        if (["final_answer", "task_complete", "error", "commentary"].includes(label)) continue;
+
+        const key = text.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        filtered.push({
+          label,
+          text: label === "task_started" && text === "Codex started working."
+            ? "已经开始处理这条请求"
+            : text,
+        });
+      }
+
+      if (!filtered.length) {
+        const fallback = normalizeThinkingText(status?.preview || "");
+        if (fallback) {
+          filtered.push({ label: "preview", text: fallback });
+        }
+      }
+
+      return filtered.slice(-3);
+    }
+
+    function thinkingElapsedMs(status = state.liveStatus) {
+      if (!status?.startedAt) return 0;
+      const startedAt = new Date(status.startedAt).getTime();
+      if (!Number.isFinite(startedAt)) return 0;
+      return Math.max(0, Date.now() - startedAt);
+    }
+
+    function clearThinkingTimer() {
+      if (!state.thinkingTimer) return;
+      clearInterval(state.thinkingTimer);
+      state.thinkingTimer = null;
+    }
+
+    function ensureThinkingTimer() {
+      if (state.thinkingTimer) return;
+      if (!state.liveStatus || state.liveStatus.status !== "running") return;
+      state.thinkingTimer = setInterval(() => {
+        renderThinking();
+      }, 1000);
+    }
+
+    function renderThinking(status = state.liveStatus) {
+      const activeStatus = status && status.status === "running" ? status : null;
+      thinkingShell.classList.toggle("hidden", !activeStatus);
+
+      if (!activeStatus) {
+        thinkingShell.innerHTML = "";
+        clearThinkingTimer();
+        return;
+      }
+
+      const elapsed = formatElapsed(thinkingElapsedMs(activeStatus));
+      const steps = thinkingSteps(activeStatus);
+      thinkingShell.innerHTML = `
+        <article class="thinking-card">
+          <div class="thinking-head">
+            <div class="thinking-title">
+              <span class="thinking-pulse" aria-hidden="true"></span>
+              <span>Codex 正在思考</span>
+            </div>
+            <div class="thinking-time">已运行 ${elapsed}</div>
+          </div>
+          <div class="thinking-steps">
+            ${steps.map((step) => `
+              <div class="thinking-step">
+                <span class="thinking-step-dot" aria-hidden="true"></span>
+                <div class="thinking-step-text">${escapeHtml(step.text)}</div>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      `;
+      ensureThinkingTimer();
+    }
+
+    function renderHistory(messages = []) {
+      state.lastMessages = messages;
+      document.body.classList.toggle("chat-active", Boolean(messages.length || state.attachments.length || messageInput.value.trim()));
+      const hasMessages = messages.length > 0;
+      heroPanel.classList.toggle("hidden", hasMessages);
+      messagesShell.classList.toggle("hidden", !hasMessages);
+
+      if (!hasMessages) {
+        historyList.innerHTML = `<div class="empty-history">这条线程里暂时还没有回流内容。你可以直接在下方输入框里提问，或者在左上角会话栏里切换其他线程。</div>`;
+        heroTitle.textContent = "今天想让 Codex 帮你做什么？";
+        return;
+      }
+
+      heroTitle.textContent = "继续这段对话";
+      historyList.innerHTML = messages.map((msg) => {
+        const attachments = normalizeAttachments(msg.attachments || []);
+        const singleClass = attachments.length === 1 ? " single" : "";
+        return `
+          <article class="message-card ${escapeHtml(msg.role || "assistant")}">
+            <div class="message-meta">
+              <span class="message-role">${escapeHtml(msg.label || msg.role || "assistant")}</span>
+              <span>${escapeHtml(formatTime(msg.timestamp || ""))}</span>
+            </div>
+            ${renderMessageText(msg)}
+            ${attachments.length ? `
+              <div class="message-images${singleClass}">
+                ${attachments.map((item) => `
+                  <div class="message-image-frame${singleClass}">
+                    <img class="message-image" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.name)}" loading="lazy">
+                  </div>
+                `).join("")}
+              </div>
+            ` : ""}
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderStatus(status = null) {
+      if (!status || status.available === false) {
+        state.liveStatus = null;
+        renderThinking(null);
+        if (state.isSending) {
+          setComposerRunning(true);
+          return;
+        }
+        setComposerRunning(false);
+        return;
+      }
+
+      if (status.status === "running") {
+        state.isSending = false;
+        state.liveStatus = status;
+      } else if (status.status === "complete" || status.status === "error" || status.status === "missing") {
+        state.isSending = false;
+        state.liveStatus = null;
+      } else {
+        state.liveStatus = null;
+      }
+
+      renderThinking(state.liveStatus);
+      setComposerRunning(status.status === "running");
+    }
+
+    async function loadThreads() {
+      const data = await api("/codex/threads");
+      state.threads = data.threads || [];
+      if (!state.currentThreadId && state.threads[0]) state.currentThreadId = state.threads[0].id;
+      renderThreadSummary();
+      renderThreadDrawer();
+    }
+
+    async function loadHistory() {
+      const threadId = state.watch?.threadId || state.currentThreadId;
+      if (!threadId) {
+        renderHistory([]);
+        return null;
+      }
+      const data = await api(`/codex/history?thread=${encodeURIComponent(threadId)}`);
+      renderHistory(data.messages || []);
+      return data;
+    }
+
+    renderHistory = function(messages = [], options = {}) {
+      const {
+        preserveScroll = false,
+        previousHeight = 0,
+        snapToBottom = false,
+      } = options;
+
+      state.lastMessages = messages;
+      state.codeBlockMap = {};
+      state.codeBlockCounter = 0;
+      state.messageBodyMap = {};
+      state.messageBodyCounter = 0;
+      document.body.classList.toggle("chat-active", Boolean(messages.length || state.attachments.length || messageInput.value.trim()));
+      const hasMessages = messages.length > 0;
+      heroPanel.classList.toggle("hidden", hasMessages);
+      messagesShell.classList.toggle("hidden", !hasMessages);
+      renderHistoryLoader(messages);
+
+      if (!hasMessages) {
+        historyList.innerHTML = `<div class="empty-history">杩欐潯绾跨▼閲屾殏鏃惰繕娌℃湁鍥炴祦鍐呭銆備綘鍙互鐩存帴鍦ㄤ笅鏂硅緭鍏ユ閲屾彁闂紝鎴栬€呭湪宸︿笂瑙掍細璇濇爮閲屽垏鎹㈠叾浠栫嚎绋嬨€?/div>`;
+        heroTitle.textContent = "浠婂ぉ鎯宠 Codex 甯綘鍋氫粈涔堬紵";
+        state.renderedThreadId = state.watch?.threadId || state.currentThreadId || "";
+        return;
+      }
+
+      heroTitle.textContent = "缁х画杩欐瀵硅瘽";
+      historyList.innerHTML = visibleMessages(messages).map((msg) => {
+        const attachments = normalizeAttachments(msg.attachments || []);
+        const singleClass = attachments.length === 1 ? " single" : "";
+        return `
+          <article class="message-card ${escapeHtml(msg.role || "assistant")}">
+            <div class="message-meta">
+              <span class="message-role">${escapeHtml(msg.label || msg.role || "assistant")}</span>
+              <span>${escapeHtml(formatTime(msg.timestamp || ""))}</span>
+            </div>
+            ${renderMessageText(msg)}
+            ${attachments.length ? `
+              <div class="message-images${singleClass}">
+                ${attachments.map((item) => `
+                  <div class="message-image-frame${singleClass}">
+                    <img class="message-image" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.name)}" loading="lazy">
+                  </div>
+                `).join("")}
+              </div>
+            ` : ""}
+          </article>
+        `;
+      }).join("");
+
+      state.renderedThreadId = state.watch?.threadId || state.currentThreadId || "";
+
+      requestAnimationFrame(() => {
+        if (preserveScroll) {
+          const nextHeight = document.documentElement.scrollHeight;
+          window.scrollTo({
+            top: Math.max(0, window.scrollY + (nextHeight - previousHeight)),
+            behavior: "auto",
+          });
+          return;
+        }
+
+        if (snapToBottom) scrollToLatest();
+      });
+    };
+
+    loadHistory = async function() {
+      const threadId = state.watch?.threadId || state.currentThreadId;
+      if (!threadId) {
+        state.visibleMessageCount = state.historyPageSize;
+        renderHistory([]);
+        return null;
+      }
+
+      const threadChanged = state.renderedThreadId !== threadId;
+      const stickToBottom = threadChanged || isNearBottom();
+      const data = await api(`/codex/history?thread=${encodeURIComponent(threadId)}`);
+
+      if (threadChanged) {
+        state.visibleMessageCount = state.historyPageSize;
+      } else {
+        state.visibleMessageCount = Math.max(state.visibleMessageCount, state.historyPageSize);
+      }
+
+      renderHistory(data.messages || [], {
+        snapToBottom: stickToBottom,
+      });
+      return data;
+    };
+
+    async function loadStatus() {
+      const params = new URLSearchParams();
+      if (state.watch?.threadId) params.set("thread", state.watch.threadId);
+      else if (state.currentThreadId) params.set("thread", state.currentThreadId);
+      if (state.watch?.sessionFile) params.set("session", state.watch.sessionFile);
+      if (state.watch?.since) params.set("since", state.watch.since);
+      const data = await api(`/codex/status?${params.toString()}`);
+      renderStatus(data);
+
+      if (data.available === true) {
+        setConnectionState("online", `Codex 状态接口正常 · ${data.status || "idle"}`);
+      } else {
+        setConnectionState("checking", "后端在线，但桌面 Codex 状态未确认");
+      }
+
+      if (data.status === "running") {
+        setMeta("Codex 正在处理，你可以继续在手机上查看回流和最近进度。");
+      } else if (data.status === "complete" && data.final) {
+        setMeta("Codex 已完成，这一轮结果已经同步回来了。");
+      } else if (data.status === "error") {
+        setMeta("Codex 这一轮执行失败了，可以查看下面的最近状态。");
+      }
+
+      return data;
+    }
+
+    async function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function collectAttachments(files) {
+      state.isReadingAttachments = true;
+      updateSendState();
+      const task = (async () => {
+        const rows = [];
+        for (const file of files) {
+          rows.push({
+            name: file.name,
+            type: file.type,
+            dataUrl: await readFileAsDataUrl(file),
+          });
+        }
+        return rows;
+      })();
+      state.attachmentReadPromise = task;
+      try {
+        return await task;
+      } finally {
+        if (state.attachmentReadPromise === task) {
+          state.attachmentReadPromise = null;
+        }
+        state.isReadingAttachments = false;
+        updateSendState();
+      }
+    }
+
+    async function selectThread(threadId) {
+      if (!threadId) return;
+      state.currentThreadId = threadId;
+      renderThreadSummary();
+      renderThreadDrawer();
+      setDrawer(false);
+      setMeta("正在切换到目标线程...");
+      try {
+        await api("/codex/select", {
+          method: "POST",
+          body: JSON.stringify({ threadId }),
+        });
+        setMeta("线程已切换，现在可以直接继续提问。");
+        await loadHistory();
+        await loadStatus();
+      } catch (error) {
+        setMeta(`切换失败: ${error.message}`);
+      }
+    }
+
+    async function refreshEverything(message = "正在同步最新状态...") {
+      setMeta(message);
+      try {
+        await loadThreads();
+        await loadHistory();
+        await loadStatus();
+        setMeta("已经同步到最新状态。");
+      } catch (error) {
+        setMeta(`同步失败: ${error.message}`);
+      }
+    }
+
+    async function createNewThread() {
+      clearPollTimer();
+      setMeta("正在让桌面 Codex 新建对话...");
+      try {
+        await api("/codex/new-thread", {
+          method: "POST",
+          body: JSON.stringify({ projectPath: "" }),
+        });
+        state.watch = null;
+        setMeta("新线程已经打开，接下来发消息就会落到新的对话里。");
+        setDrawer(false);
+        setTimeout(() => {
+          loadThreads().catch(() => {});
+        }, 1000);
+      } catch (error) {
+        setMeta(`新建失败: ${error.message}`);
+      }
+    }
+
+    tokenBox.textContent = maskToken(token);
+    composerStatusMeta.textContent = token ? "本地直连" : "缺少 token";
+    setConnectionState(token ? "checking" : "offline", token ? "后端在线前先检查 Codex 状态" : "缺少 token");
+
+    fileInput.addEventListener("change", async () => {
+      const files = Array.from(fileInput.files || []);
+      if (!files.length) return;
+
+      setMeta("正在读取图片...");
+      try {
+        const rows = await collectAttachments(files);
+        state.attachments.push(...rows);
+        renderAttachmentPreview();
+      } catch (error) {
+        setMeta(`图片读取失败: ${error.message}`);
+      } finally {
+        fileInput.value = "";
+      }
+    });
+
+    messageInput.addEventListener("input", () => {
+      document.body.classList.toggle("chat-active", Boolean(messageInput.value.trim() || state.attachments.length || state.lastMessages.length));
+      autoResizeComposer();
+      updateSendState();
+    });
+
+    modelPickerBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setModelPanel(!state.modelPanelOpen);
+      renderModelPicker();
+    });
+
+    brandChip.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setBrandStatusOpen(!state.brandStatusOpen);
+    });
+
+    document.getElementById("closeModelPanelBtn").addEventListener("click", () => {
+      setModelPanel(false);
+    });
+
+    applyModelBtn.addEventListener("click", async () => {
+      await applyModelConfig();
+    });
+
+    document.getElementById("menuBtn").addEventListener("click", async () => {
+      try {
+        await loadThreads();
+      } catch {}
+      setDrawer(true);
+    });
+
+    document.getElementById("closeDrawerBtn").addEventListener("click", () => {
+      setDrawer(false);
+    });
+
+    drawerBackdrop.addEventListener("click", () => {
+      setDrawer(false);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!brandChip.contains(event.target)) {
+        setBrandStatusOpen(false);
+      }
+      if (!state.modelPanelOpen) return;
+      if (modelPanel.contains(event.target) || modelPickerBtn.contains(event.target)) return;
+      setModelPanel(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.brandStatusOpen) {
+        setBrandStatusOpen(false);
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.drawerOpen) setDrawer(false);
+      if (event.key === "Escape" && state.modelPanelOpen) setModelPanel(false);
+    });
+
+    window.addEventListener("touchstart", (event) => {
+      if (event.touches.length !== 1) return;
+      beginPullGesture(event.touches[0].clientY);
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (event) => {
+      if (!state.pullActive) return;
+
+      const touch = event.touches[0];
+      if (!touch) return;
+      if (window.scrollY > 6 || state.drawerOpen) {
+        resetPullGesture();
+        renderHistoryLoader();
+        return;
+      }
+
+      if (touch.clientY > state.pullStartY) {
+        event.preventDefault();
+      }
+      updatePullGesture(touch.clientY);
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+      if (!state.pullActive || state.pullTriggered || state.loadingOlderMessages) return;
+      resetPullGesture();
+      renderHistoryLoader();
+    }, { passive: true });
+
+    window.addEventListener("touchcancel", () => {
+      if (!state.pullActive || state.pullTriggered || state.loadingOlderMessages) return;
+      resetPullGesture();
+      renderHistoryLoader();
+    }, { passive: true });
+
+    window.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "touch" || event.isPrimary === false) return;
+      beginPullGesture(event.clientY, event.pointerId);
+    });
+
+    window.addEventListener("pointermove", (event) => {
+      if (event.pointerType === "touch") return;
+      if (!state.pullActive || state.pullPointerId !== event.pointerId) return;
+
+      if (window.scrollY > 6 || state.drawerOpen) {
+        resetPullGesture();
+        renderHistoryLoader();
+        return;
+      }
+
+      if (event.clientY > state.pullStartY) {
+        event.preventDefault();
+      }
+      updatePullGesture(event.clientY);
+    });
+
+    window.addEventListener("pointerup", (event) => {
+      if (!state.pullActive || state.pullPointerId !== event.pointerId || state.pullTriggered || state.loadingOlderMessages) return;
+      resetPullGesture();
+      renderHistoryLoader();
+    });
+
+    window.addEventListener("pointercancel", (event) => {
+      if (!state.pullActive || state.pullPointerId !== event.pointerId || state.pullTriggered || state.loadingOlderMessages) return;
+      resetPullGesture();
+      renderHistoryLoader();
+    });
+
+    window.addEventListener("mousedown", (event) => {
+      if (event.button !== 0) return;
+      beginPullGesture(event.clientY, "mouse");
+    });
+
+    window.addEventListener("mousemove", (event) => {
+      if (!state.pullActive || state.pullPointerId !== "mouse") return;
+
+      if (window.scrollY > 6 || state.drawerOpen) {
+        resetPullGesture();
+        renderHistoryLoader();
+        return;
+      }
+
+      if (event.clientY > state.pullStartY) {
+        event.preventDefault();
+      }
+      updatePullGesture(event.clientY);
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!state.pullActive || state.pullPointerId !== "mouse" || state.pullTriggered || state.loadingOlderMessages) return;
+      resetPullGesture();
+      renderHistoryLoader();
+    });
+
+    document.getElementById("drawerNewThreadBtn").addEventListener("click", createNewThread);
+
+    historyList.addEventListener("click", (event) => {
+      const richCopy = event.target.closest("[data-copy-message]");
+      if (richCopy) {
+        copyMessageBody(richCopy);
+        return;
+      }
+      const messageToggle = event.target.closest("[data-toggle-message]");
+      if (messageToggle) {
+        toggleMessageBlock(messageToggle);
+        return;
+      }
+      const toggle = event.target.closest("[data-toggle-code]");
+      if (toggle) {
+        toggleCodeBlock(toggle);
+        return;
+      }
+      const button = event.target.closest("[data-copy-code]");
+      if (!button) return;
+      copyCodeBlock(button);
+    });
+
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      if (state.isRunning) {
+        await interruptConversation();
+        return;
+      }
+
+      if (state.attachmentReadPromise) {
+        setMeta("姝ｅ湪绛夊浘鐗囪鍙栧畬鎴?..");
+        try {
+          await state.attachmentReadPromise;
+        } catch {
+          return;
+        }
+      }
+
+      if (!messageInput.value.trim() && !state.attachments.length) return;
+
+      clearPollTimer();
+      state.isSending = true;
+      state.interruptRequested = false;
+      setComposerRunning(true);
+      setMeta("正在把消息送进桌面 Codex...");
+      const payload = {
+        text: messageInput.value,
+        threadId: state.currentThreadId,
+        attachments: [...state.attachments],
+      };
+
+      try {
+        const data = await api("/send", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        state.watch = data.watch;
+        if (!payload.threadId && data.watch?.threadId) {
+          state.currentThreadId = data.watch.threadId;
+        }
+        setMeta(`已发送 ${formatTime(data.sentAt || "")}`);
+        messageInput.value = "";
+        state.attachments = [];
+        autoResizeComposer();
+        renderAttachmentPreview();
+        updateSendState();
+        await loadThreads();
+        await loadHistory();
+        const status = await loadStatus();
+        if (state.interruptRequested && status && status.status === "running") {
+          await interruptConversation();
+        } else if (status && (status.status === "running" || state.isSending || state.interruptRequested)) {
+          schedulePoll();
+        }
+      } catch (error) {
+        setComposerRunning(false);
+        setMeta(`发送失败: ${error.message}`);
+      }
+    });
+
+    async function boot() {
+      autoResizeComposer();
+      updateSendState();
+      renderAttachmentPreview();
+      renderModelPicker();
+
+      if (!state.token) {
+        setMeta("缺少 token，当前页面无法调用本地服务。");
+        tokenBox.textContent = "缺少 token";
+        composerStatusMeta.textContent = "未鉴权";
+        setConnectionState("offline", "缺少 token");
+        return;
+      }
+
+      try {
+        await loadModelConfig().catch(() => {});
+        await loadThreads();
+        await loadHistory();
+        await loadStatus();
+      } catch (error) {
+        setConnectionState("offline", error.message || "连接失败");
+        setMeta(`初始化失败: ${error.message}`);
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>

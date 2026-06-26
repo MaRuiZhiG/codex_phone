@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex Phone 配置助手</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --panel: rgba(255, 255, 255, 0.96);
+      --panel-strong: #ffffff;
+      --text: #0f172a;
+      --muted: #667085;
+      --line: rgba(15, 23, 42, 0.08);
+      --blue: #2f80ff;
+      --blue-soft: rgba(47, 128, 255, 0.1);
+      --green: #16966b;
+      --green-soft: rgba(22, 150, 107, 0.1);
+      --amber: #c47912;
+      --amber-soft: rgba(196, 121, 18, 0.12);
+      --red: #c93c3c;
+      --red-soft: rgba(201, 60, 60, 0.1);
+      --shadow: 0 24px 56px rgba(20, 33, 61, 0.1);
+      --shadow-soft: 0 14px 26px rgba(20, 33, 61, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      font-family: "Segoe UI Variable Display", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 86% 10%, rgba(47, 128, 255, 0.16), transparent 24%),
+        radial-gradient(circle at 8% 22%, rgba(128, 198, 255, 0.12), transparent 24%),
+        linear-gradient(180deg, #fafcff 0%, #f3f7fc 100%);
+      color: var(--text);
+    }
+
+    button, input, select, details { font: inherit; }
+
+    .page {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 52px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.92fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px) saturate(1.08);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 46%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .hero-main {
+      padding: 28px 28px 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.92), 0 10px 22px rgba(69, 108, 171, 0.08);
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: 42px;
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+    }
+
+    .hero-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.78;
+      max-width: 46em;
+    }
+
+    .hero-actions,
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-actions {
+      margin-top: 22px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.94), 0 10px 22px rgba(69, 108, 171, 0.08);
+      transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .button:hover {
+      border-color: rgba(47, 128, 255, 0.28);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.96), 0 14px 26px rgba(69, 108, 171, 0.12);
+    }
+
+    .button:active { transform: scale(.98); }
+
+    .button.primary {
+      background: linear-gradient(180deg, #4c9dff 0%, #2f80ff 100%);
+      border-color: var(--blue);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 16px 28px rgba(47, 128, 255, 0.22);
+    }
+
+    .button.success {
+      background: linear-gradient(180deg, #21b57a 0%, #16966b 100%);
+      border-color: var(--green);
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 16px 28px rgba(22, 150, 107, 0.22);
+    }
+
+    .hero-side {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .metric {
+      padding: 16px 18px;
+      border-radius: var(--radius-lg);
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }
+
+    .metric-sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section {
+      padding: 24px;
+    }
+
+    .section-title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .section-sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.74;
+    }
+
+    .step-banner {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(47, 128, 255, 0.08), rgba(255,255,255,0.92));
+      border: 1px solid rgba(47, 128, 255, 0.12);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .step-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .step-eyebrow {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(47, 128, 255, 0.14);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .step-title {
+      margin-top: 8px;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .step-copy {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .step-tips {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .tip {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.76);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: var(--shadow-soft);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .scenario-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .scenario-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .scenario-card:hover { transform: translateY(-1px); }
+
+    .scenario-card.active {
+      border-color: rgba(47, 128, 255, 0.34);
+      background: linear-gradient(180deg, rgba(47, 128, 255, 0.08), rgba(255,255,255,0.97));
+      box-shadow: inset 0 0 0 1px rgba(47, 128, 255, 0.12), 0 18px 30px rgba(47, 128, 255, 0.1);
+    }
+
+    .scenario-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .scenario-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.68;
+    }
+
+    .field-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 170px;
+      gap: 12px;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    .help {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 13px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .chip button {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .status-box,
+    .entry-card,
+    .mini-card {
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .status-box {
+      padding: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      background: #f8fbff;
+    }
+
+    .status-box.ok {
+      background: var(--green-soft);
+      border-color: rgba(22, 150, 107, 0.16);
+    }
+
+    .status-box.warn {
+      background: var(--amber-soft);
+      border-color: rgba(196, 121, 18, 0.16);
+    }
+
+    .status-box.error {
+      background: var(--red-soft);
+      border-color: rgba(201, 60, 60, 0.16);
+    }
+
+    .status-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .status-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(15, 23, 42, 0.08);
+      color: #536174;
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+
+    .status-box.ok .status-icon {
+      background: rgba(22, 150, 107, 0.18);
+      color: #0f7f58;
+    }
+
+    .status-box.warn .status-icon {
+      background: rgba(196, 121, 18, 0.18);
+      color: #aa690e;
+    }
+
+    .status-box.error .status-icon {
+      background: rgba(201, 60, 60, 0.18);
+      color: #b23838;
+    }
+
+    .status-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .status-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .status-sub {
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.68;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .status-box.ok .status-sub { color: #0f7f58; }
+    .status-box.warn .status-sub { color: #9a670f; }
+    .status-box.error .status-sub { color: #a53b3b; }
+
+    .status-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .entry-card {
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(47, 128, 255, 0.09), rgba(255,255,255,0.97));
+      border: 1px solid rgba(47, 128, 255, 0.14);
+    }
+
+    .entry-label,
+    .mini-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .entry-url {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.94);
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.75;
+      word-break: break-all;
+    }
+
+    .mini-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-card {
+      padding: 14px 16px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+    }
+
+    .mini-value {
+      font-size: 14px;
+      line-height: 1.72;
+      word-break: break-word;
+    }
+
+    .mini-value strong {
+      font-size: 15px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .list-index {
+      width: 28px;
+      height: 28px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .list-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.68;
+    }
+
+    details.advanced {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    details.advanced summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    details.advanced summary::-webkit-details-marker { display: none; }
+
+    .advanced-body {
+      padding: 0 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(17, 24, 39, 0.92);
+      color: #fff;
+      font-size: 13px;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="card hero-main">
+        <div class="eyebrow">只在这台电脑上打开的本地配置页</div>
+        <h1>Codex Phone 配置助手</h1>
+        <p class="hero-copy">
+          这个页面专门帮你把手机连接到这台电脑上的 Codex。你不需要理解太多技术细节，只要按步骤选场景、填好 ZeroTier 地址、做一次检测，最后复制手机入口就能用了。
+        </p>
+        <div class="hero-actions">
+          <button class="button primary" id="refreshAllBtn">刷新当前状态</button>
+          <button class="button" id="copyEffectiveBtn">复制推荐手机入口</button>
+          <a class="button" href="/" target="_blank" rel="noreferrer">打开手机聊天页</a>
+        </div>
+      </div>
+
+      <aside class="card hero-side">
+        <div class="metric">
+          <div class="metric-label">现在建议你怎么连</div>
+          <div class="metric-value" id="metricMode">读取中</div>
+          <div class="metric-sub" id="metricModeSub">正在读取当前推荐方案。</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">现在手机该打开哪个地址</div>
+          <div class="metric-value" id="metricUrl">读取中</div>
+          <div class="metric-sub">这个地址会自动带上 token，通常直接复制到手机浏览器就行。</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">当前进度</div>
+          <div class="metric-value" id="metricProgress">正在判断</div>
+          <div class="metric-sub" id="metricProgressSub">系统会告诉你下一步最该做什么。</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <section class="card section">
+          <div class="step-banner">
+            <div class="step-top">
+              <div class="step-eyebrow">当前最该做什么</div>
+              <div class="step-badge" id="guideBadge">准备中</div>
+            </div>
+            <div class="step-title" id="guideTitle">正在读取当前状态</div>
+            <div class="step-copy" id="guideCopy">等页面读取完后，这里会直接告诉你下一步该做什么。</div>
+            <div class="step-tips" id="guideTips"></div>
+          </div>
+        </section>
+
+        <section class="card section">
+          <h2 class="section-title">1. 先选你的使用场景</h2>
+          <p class="section-sub">直接按你的真实情况选就行，不用管底层是什么模式。系统会自动帮你映射。</p>
+          <div class="scenario-list" id="scenarioList"></div>
+        </section>
+
+        <section class="card section">
+          <h2 class="section-title">2. 配好 ZeroTier 远程地址</h2>
+          <p class="section-sub">如果你准备在外面远程访问宿舍电脑，重点就是这里。电脑连上 ZeroTier 后，系统通常能自动识别出可用地址。</p>
+          <div class="field-list">
+            <div class="chips" id="zerotierDetected"></div>
+            <div class="field">
+              <label for="zerotierIpInput">ZeroTier IP</label>
+              <input class="input" id="zerotierIpInput" placeholder="例如 10.41.82.50">
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="zerotierPortInput">端口</label>
+                <input class="input" id="zerotierPortInput" type="number" min="1" max="65535" value="8787">
+              </div>
+              <div class="field">
+                <label for="zerotierEnabledInput">保存后是否立即启用</label>
+                <select class="select" id="zerotierEnabledInput">
+                  <option value="true">立即启用</option>
+                  <option value="false">先只保存</option>
+                </select>
+              </div>
+            </div>
+            <div class="help">如果手机和电脑都已经加入同一个 ZeroTier 网络，并且后台里都显示已授权，这里的地址通常就是你远程访问电脑的正确入口。</div>
+          </div>
+          <div class="hero-actions">
+            <button class="button primary" id="saveZeroTierBtn">保存并检测</button>
+            <button class="button" id="checkZeroTierBtn">重新检测 ZeroTier</button>
+            <button class="button" id="fillDetectedBtn">填入自动识别地址</button>
+          </div>
+        </section>
+
+        <section class="card section">
+          <h2 class="section-title">3. 看结果和修复建议</h2>
+          <p class="section-sub">这里不会只告诉你成功或失败，还会尽量告诉你下一步应该怎么修。</p>
+          <div class="status-box" id="zerotierCheckBox"></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card section">
+          <h2 class="section-title">最终手机入口</h2>
+          <p class="section-sub">如果你只关心手机最后应该打开哪个地址，就看这里。</p>
+          <div class="entry-card">
+            <div class="entry-label">推荐手机入口</div>
+            <div class="entry-url" id="effectiveLinkValue">读取中</div>
+            <div class="hero-actions">
+              <button class="button success" id="openEffectiveBtn">打开手机入口</button>
+              <button class="button" id="copyEffectiveMainBtn">复制这个入口</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card section">
+          <h2 class="section-title">你只要记住这三步</h2>
+          <div class="list">
+            <div class="list-item">
+              <div class="list-index">1</div>
+              <div class="list-copy">先确认这台电脑上的 `Codex Phone` 后端已经启动，然后回到这个页面刷新状态。</div>
+            </div>
+            <div class="list-item">
+              <div class="list-index">2</div>
+              <div class="list-copy">如果你要外出远程访问，让手机和电脑都加入同一个 ZeroTier 网络，再保存并检测一次。</div>
+            </div>
+            <div class="list-item">
+              <div class="list-index">3</div>
+              <div class="list-copy">检测通过后，直接复制上面的推荐手机入口到手机浏览器，一般就能马上用了。</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card section">
+          <h2 class="section-title">当前连接情况</h2>
+          <p class="section-sub">这里是给你一眼看懂当前到底能不能连。</p>
+          <div class="mini-grid">
+            <div class="mini-card">
+              <div class="mini-title">当前实际连接方式</div>
+              <div class="mini-value" id="effectiveModeBadge">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">局域网状态</div>
+              <div class="mini-value" id="lanStatusValue">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">ZeroTier 状态</div>
+              <div class="mini-value" id="zerotierStatusValue">读取中</div>
+            </div>
+          </div>
+        </section>
+
+        <details class="advanced">
+          <summary>高级信息和排查用信息</summary>
+          <div class="advanced-body">
+            <div class="mini-card">
+              <div class="mini-title">推荐手机入口</div>
+              <div class="mini-value" id="effectiveLinkMini">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">局域网入口</div>
+              <div class="mini-value" id="lanLinkValue">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">ZeroTier 入口</div>
+              <div class="mini-value" id="zerotierLinkValue">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">当前 token</div>
+              <div class="mini-value" id="metricTokenMirror">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">本地状态目录</div>
+              <div class="mini-value" id="stateDirValue">读取中</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-title">日志文件</div>
+              <div class="mini-value" id="logFileValue">读取中</div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const state = {
+      bootstrap: null,
+      access: null,
+      zerotierCheck: null,
+      scenario: "remote",
+    };
+
+    const scenarios = [
+      {
+        id: "remote",
+        mode: "zerotier",
+        name: "我人在外面，要远程访问宿舍电脑",
+        desc: "推荐走 ZeroTier。适合手机和电脑不在同一个 Wi-Fi，但两边都已经加入同一个 ZeroTier 网络。",
+      },
+      {
+        id: "wifi",
+        mode: "lan",
+        name: "我和电脑就在同一个 Wi-Fi 里",
+        desc: "推荐直接走局域网。适合手机和电脑现在就在同一个路由器下面。",
+      },
+      {
+        id: "auto",
+        mode: "auto",
+        name: "我不确定，让系统自动帮我选",
+        desc: "系统会优先尝试 ZeroTier；如果还没配好，就自动回退到局域网。",
+      },
+    ];
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    async function request(url, options = {}) {
+      const response = await fetch(url, {
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.message || "请求失败");
+      }
+      return data;
+    }
+
+    function textOrFallback(value, fallback = "未配置") {
+      return value && String(value).trim() ? value : fallback;
+    }
+
+    function modeLabel(mode) {
+      const normalized = String(mode || "").toLowerCase();
+      if (normalized === "lan") return "同一 Wi-Fi 局域网";
+      if (normalized === "zerotier") return "ZeroTier 远程连接";
+      if (normalized === "public") return "公网入口";
+      if (normalized === "auto") return "自动选择";
+      return "未确定";
+    }
+
+    function buildProgress(access, check) {
+      if (!access?.zerotierIp) {
+        return {
+          badge: "待填写",
+          title: "先把 ZeroTier 地址填好",
+          subtitle: "如果你要远程访问，现在最重要的是先填好 ZeroTier IP 和端口。",
+          tips: [
+            "如果下面已经自动识别到地址，可以直接点“填入自动识别地址”。",
+            "保存后做一次检测，系统才知道这条地址能不能真的连通。",
+          ],
+          tone: "warn",
+        };
+      }
+
+      if (!access?.zerotierEnabled) {
+        return {
+          badge: "待启用",
+          title: "地址已经保存，但还没有启用",
+          subtitle: "如果这条地址就是你要给手机用的入口，建议改成“立即启用”后再保存一次。",
+          tips: [
+            "不启用也能先保存，但系统不会把它当成当前推荐入口。",
+            "启用后再做检测，手机入口才会优先切到 ZeroTier。",
+          ],
+          tone: "warn",
+        };
+      }
+
+      if (!check) {
+        return {
+          badge: "待检测",
+          title: "下一步：检测这条 ZeroTier 地址",
+          subtitle: "你已经填好了地址，但系统还没有确认它能不能访问。",
+          tips: [
+            "点一次“保存并检测”就够了，系统会自动给出结果和修复建议。",
+            "如果你刚改过 ZeroTier 网络或防火墙，也建议重新检测一次。",
+          ],
+          tone: "warn",
+        };
+      }
+
+      if (!check.reachable) {
+        return {
+          badge: "待修复",
+          title: "ZeroTier 地址暂时还不能用",
+          subtitle: "请先看下方失败原因。通常是 IP 填错、端口不对，或电脑服务没有启动。",
+          tips: [
+            "如果电脑和手机都已加入 ZeroTier，但还是超时，优先检查两边是否都显示已授权。",
+            "如果提示端口拒绝，通常说明后端服务没开，或者端口不是 8787。",
+          ],
+          tone: "error",
+        };
+      }
+
+      return {
+        badge: "已就绪",
+        title: "现在可以直接把手机连上来了",
+        subtitle: "检测已经通过。你现在只需要复制右侧的推荐手机入口，或者直接打开手机入口。",
+        tips: [
+          "后面手机再访问时，优先用右侧这个推荐手机入口。",
+          "如果哪天 ZeroTier 地址变了，回来重新保存并检测一次就行。",
+        ],
+        tone: "ok",
+      };
+    }
+
+    function statusLabel(access) {
+      if (!access?.zerotierIp) return "未配置";
+      if (!access?.zerotierEnabled) return "已保存，未启用";
+      if (state.zerotierCheck?.reachable) return "可用";
+      if (state.zerotierCheck && !state.zerotierCheck.reachable) return "检测失败";
+      return "待检测";
+    }
+
+    function renderGuide(access) {
+      const progress = buildProgress(access, state.zerotierCheck);
+      document.getElementById("guideBadge").textContent = progress.badge;
+      document.getElementById("guideTitle").textContent = progress.title;
+      document.getElementById("guideCopy").textContent = progress.subtitle;
+      document.getElementById("metricProgress").textContent = progress.badge;
+      document.getElementById("metricProgressSub").textContent = progress.subtitle;
+
+      const tipsWrap = document.getElementById("guideTips");
+      tipsWrap.innerHTML = progress.tips.map((tip) => `<div class="tip">${tip}</div>`).join("");
+    }
+
+    function renderScenarios() {
+      const wrap = document.getElementById("scenarioList");
+      wrap.innerHTML = scenarios.map((item) => `
+        <button class="scenario-card ${state.scenario === item.id ? "active" : ""}" type="button" data-scenario="${item.id}">
+          <div class="scenario-name">${item.name}</div>
+          <div class="scenario-desc">${item.desc}</div>
+        </button>
+      `).join("");
+
+      wrap.querySelectorAll("[data-scenario]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const scenarioId = button.getAttribute("data-scenario") || "remote";
+          const selected = scenarios.find((item) => item.id === scenarioId);
+          if (!selected) return;
+          state.scenario = scenarioId;
+          renderScenarios();
+          const data = await request("/admin/access/mode", {
+            method: "POST",
+            body: JSON.stringify({ mode: selected.mode }),
+          });
+          applyAccess(data.access);
+          showToast("已切换推荐场景");
+        });
+      });
+    }
+
+    function renderDetectedIps(access) {
+      const detected = access?.zerotierIps || [];
+      const wrap = document.getElementById("zerotierDetected");
+      wrap.innerHTML = detected.length
+        ? detected.map((ip) => `<div class="chip">${ip} <button type="button" data-ip="${ip}">填入</button></div>`).join("")
+        : `<div class="chip">暂时还没识别到 ZeroTier IP</div>`;
+
+      wrap.querySelectorAll("button[data-ip]").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.getElementById("zerotierIpInput").value = button.dataset.ip || "";
+          document.getElementById("zerotierEnabledInput").value = "true";
+          showToast("已填入自动识别的 ZeroTier 地址");
+        });
+      });
+    }
+
+    function renderZeroTierCheck(check = null) {
+      const box = document.getElementById("zerotierCheckBox");
+
+      if (!check) {
+        box.className = "status-box warn";
+        box.innerHTML = `
+          <div class="status-head">
+            <div class="status-icon">i</div>
+            <div class="status-main">
+              <div class="status-title">还没有做 ZeroTier 检测</div>
+              <div class="status-sub">先点一次“保存并检测”或“重新检测 ZeroTier”，系统才能确认这组地址和端口能不能真的访问。</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (check.reachable) {
+        box.className = "status-box ok";
+        box.innerHTML = `
+          <div class="status-head">
+            <div class="status-icon">OK</div>
+            <div class="status-main">
+              <div class="status-title">这组 ZeroTier 地址已经可以访问</div>
+              <div class="status-sub">检测通过：${check.baseUrl} 可访问，健康检查返回 ${check.statusCode || 200}。现在可以直接给手机使用。</div>
+            </div>
+          </div>
+          <div class="status-actions">
+            <button class="button success" id="statusOpenBtn" type="button">打开手机入口</button>
+            <button class="button" id="statusCopyBtn" type="button">复制推荐入口</button>
+          </div>
+        `;
+        document.getElementById("statusOpenBtn").addEventListener("click", openEffectiveLink);
+        document.getElementById("statusCopyBtn").addEventListener("click", copyEffectiveLink);
+        return;
+      }
+
+      const detail = String(check.error || (check.statusCode ? `HTTP ${check.statusCode}` : "未连通"));
+      let advice = "先检查 ZeroTier IP 和端口有没有填错。";
+      if (/10061|refused|拒绝|connection refused/i.test(detail)) {
+        advice = "像是端口被拒绝。通常说明后端服务没启动，或者端口不是 8787。";
+      } else if (/timed out|超时/i.test(detail)) {
+        advice = "像是网络超时。通常说明 ZeroTier 没有真正连通，或者这个 IP 不是当前电脑的 ZeroTier 地址。";
+      } else if (/401|unauthorized/i.test(detail)) {
+        advice = "服务已经能访问，但鉴权失败。通常说明 token 或访问地址被改过。";
+      }
+
+      box.className = "status-box error";
+      box.innerHTML = `
+        <div class="status-head">
+          <div class="status-icon">!</div>
+          <div class="status-main">
+            <div class="status-title">这组 ZeroTier 地址暂时还不能用</div>
+            <div class="status-sub">失败原因：${detail}<br>下一步建议：${advice}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function formatLanStatus(access) {
+      const url = textOrFallback(access?.lanUrl);
+      return `<strong>可用</strong><br>${url}`;
+    }
+
+    function formatZeroTierStatus(access) {
+      const label = statusLabel(access);
+      const url = access?.zerotierUrl ? access.zerotierUrl : "还没有配置 ZeroTier 地址";
+      return `<strong>${label}</strong><br>${url}`;
+    }
+
+    function syncScenarioFromMode(mode) {
+      const normalized = String(mode || "auto").toLowerCase();
+      if (normalized === "lan") state.scenario = "wifi";
+      else if (normalized === "zerotier") state.scenario = "remote";
+      else state.scenario = "auto";
+    }
+
+    function applyAccess(access) {
+      state.access = access;
+      state.zerotierCheck = access.zerotierCheck || state.zerotierCheck || null;
+
+      const preferredMode = modeLabel(access.mode);
+      const effectiveMode = modeLabel(access.effectiveMode);
+      document.getElementById("metricMode").textContent = effectiveMode;
+      document.getElementById("metricModeSub").textContent = `你的手动偏好是 ${preferredMode}，系统当前实际给手机使用的是 ${effectiveMode}。`;
+      document.getElementById("metricUrl").textContent = textOrFallback(access.effectiveLink);
+      document.getElementById("metricTokenMirror").textContent = state.bootstrap?.token || "读取中";
+
+      document.getElementById("effectiveModeBadge").innerHTML = `<strong>${effectiveMode}</strong><br>手动偏好：${preferredMode}`;
+      document.getElementById("lanStatusValue").innerHTML = formatLanStatus(access);
+      document.getElementById("zerotierStatusValue").innerHTML = formatZeroTierStatus(access);
+
+      document.getElementById("effectiveLinkValue").textContent = textOrFallback(access.effectiveLink);
+      document.getElementById("effectiveLinkMini").textContent = textOrFallback(access.effectiveLink);
+      document.getElementById("lanLinkValue").textContent = textOrFallback(access.lanLink);
+      document.getElementById("zerotierLinkValue").textContent = textOrFallback(access.zerotierLink);
+
+      document.getElementById("zerotierIpInput").value = access.zerotierIp || "";
+      document.getElementById("zerotierPortInput").value = access.zerotierPort || 8787;
+      document.getElementById("zerotierEnabledInput").value = String(Boolean(access.zerotierEnabled));
+
+      renderDetectedIps(access);
+      renderZeroTierCheck(state.zerotierCheck);
+      renderGuide(access);
+      syncScenarioFromMode(access.mode);
+      renderScenarios();
+    }
+
+    async function loadBootstrap() {
+      const data = await request("/admin/bootstrap");
+      state.bootstrap = data;
+      document.getElementById("metricTokenMirror").textContent = data.token || "未读取到";
+      document.getElementById("stateDirValue").textContent = data.stateDir || "未读取到";
+      document.getElementById("logFileValue").textContent = data.logFile || "未读取到";
+      applyAccess(data.access);
+    }
+
+    async function refreshAccess() {
+      const data = await request("/admin/access/check", { method: "POST", body: "{}" });
+      applyAccess(data.access);
+      showToast("状态已刷新");
+    }
+
+    async function saveZeroTier() {
+      const data = await request("/admin/access/zerotier/config", {
+        method: "POST",
+        body: JSON.stringify({
+          zerotierIp: document.getElementById("zerotierIpInput").value.trim(),
+          zerotierPort: Number(document.getElementById("zerotierPortInput").value || 8787),
+          enabled: document.getElementById("zerotierEnabledInput").value === "true",
+        }),
+      });
+      applyAccess(data.access);
+      showToast("配置已保存，正在检测");
+      await checkZeroTier();
+    }
+
+    async function checkZeroTier() {
+      const data = await request("/admin/access/zerotier/check", {
+        method: "POST",
+        body: "{}",
+      });
+      applyAccess(data.access);
+      if (state.zerotierCheck?.reachable) {
+        showToast("ZeroTier 检测通过");
+      } else {
+        showToast("检测失败，请看修复建议");
+      }
+    }
+
+    async function copyText(text) {
+      await navigator.clipboard.writeText(text);
+    }
+
+    async function copyEffectiveLink() {
+      try {
+        await copyText(state.access?.effectiveLink || "");
+        showToast("推荐手机入口已复制");
+      } catch {
+        showToast("复制失败，请手动复制");
+      }
+    }
+
+    function openEffectiveLink() {
+      const url = state.access?.effectiveLink || "";
+      if (!url) {
+        showToast("当前还没有可打开的手机入口");
+        return;
+      }
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    document.getElementById("refreshAllBtn").addEventListener("click", refreshAccess);
+    document.getElementById("copyEffectiveBtn").addEventListener("click", copyEffectiveLink);
+    document.getElementById("copyEffectiveMainBtn").addEventListener("click", copyEffectiveLink);
+    document.getElementById("openEffectiveBtn").addEventListener("click", openEffectiveLink);
+    document.getElementById("saveZeroTierBtn").addEventListener("click", saveZeroTier);
+    document.getElementById("checkZeroTierBtn").addEventListener("click", checkZeroTier);
+    document.getElementById("fillDetectedBtn").addEventListener("click", () => {
+      const detected = state.access?.zerotierIps || [];
+      if (!detected.length) {
+        showToast("当前没有自动识别到 ZeroTier 地址");
+        return;
+      }
+      document.getElementById("zerotierIpInput").value = detected[0];
+      document.getElementById("zerotierEnabledInput").value = "true";
+      showToast("已自动填入第一个 ZeroTier 地址");
+    });
+
+    loadBootstrap().catch((error) => {
+      showToast(error.message || "管理页初始化失败");
+    });
+  </script>
+</body>
+</html>
