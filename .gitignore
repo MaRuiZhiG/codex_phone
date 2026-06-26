@@ -7,6 +7,7 @@ build/
 dist/
 release/
 *.spec.bak
+CodexPhoneSetup-*.spec
 
 # Virtual environments
 .venv/

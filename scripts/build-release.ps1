@@ -1,6 +1,7 @@
 param(
     [string]$Version = "0.1.0",
     [string]$PythonExe = "",
+    [switch]$Installer,
     [switch]$Clean
 )
 
@@ -118,3 +119,7 @@ Write-Host $ZipPath
 Write-Host ""
 Write-Host "Test it with:"
 Write-Host "  dist\CodexPhone\CodexPhone.exe"
+
+if ($Installer) {
+    & (Join-Path $PSScriptRoot "build-installer.ps1") -Version $Version
+}
