@@ -25,6 +25,7 @@ Codex Phone
 ## 先看这个：我应该选哪种连接方式？
 
 Codex Phone 有两种常见用法。
+<img width="650" height="325" alt="f10b9fdf-0193-4f2b-95cc-1d90e2c21d36" src="https://github.com/user-attachments/assets/7a617f26-47ce-46c6-b780-2cf06ae01b29" />
 
 ### 方式一：手机和电脑在同一个 Wi-Fi 下
 
