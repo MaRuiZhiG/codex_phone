@@ -1,3 +1,4 @@
+![Uploading CodexPhonelogo.png…]()
 # Codex Phone
 
 `Codex Phone` 可以让你用手机网页控制 Windows 电脑上的 `Codex Desktop`。
