@@ -1,4 +1,5 @@
-![Uploading CodexPhonelogo.png…]()
+<img width="1254" height="1254" alt="CodexPhonelogo" src="https://github.com/user-attachments/assets/22cdf115-7889-47fe-9d75-75aecab50c5e" />
+
 # Codex Phone
 
 `Codex Phone` 可以让你用手机网页控制 Windows 电脑上的 `Codex Desktop`。
