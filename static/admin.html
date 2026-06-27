@@ -45,14 +45,14 @@
     button, input, select, details { font: inherit; }
 
     .page {
-      width: min(1160px, calc(100% - 32px));
+      width: min(860px, calc(100% - 32px));
       margin: 0 auto;
       padding: 28px 0 52px;
     }
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.92fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
       margin-bottom: 18px;
     }
@@ -98,7 +98,7 @@
       margin: 16px 0 12px;
       font-size: 42px;
       line-height: 1.05;
-      letter-spacing: -0.05em;
+      letter-spacing: 0;
     }
 
     .hero-copy {
@@ -144,6 +144,18 @@
 
     .button:active { transform: scale(.98); }
 
+    .button:disabled {
+      opacity: .54;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .button:disabled:hover {
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
     .button.primary {
       background: linear-gradient(180deg, #4c9dff 0%, #2f80ff 100%);
       border-color: var(--blue);
@@ -161,6 +173,7 @@
     .hero-side {
       padding: 22px;
       display: grid;
+      grid-template-columns: 1fr;
       gap: 14px;
       align-content: start;
     }
@@ -182,7 +195,7 @@
     .metric-value {
       font-size: 22px;
       font-weight: 700;
-      letter-spacing: -0.03em;
+      letter-spacing: 0;
       word-break: break-word;
     }
 
@@ -195,7 +208,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
     }
 
@@ -208,10 +221,14 @@
       padding: 24px;
     }
 
+    .is-hidden {
+      display: none !important;
+    }
+
     .section-title {
       margin: 0 0 6px;
       font-size: 24px;
-      letter-spacing: -0.04em;
+      letter-spacing: 0;
     }
 
     .section-sub {
@@ -392,7 +409,6 @@
     }
 
     .status-box,
-    .entry-card,
     .mini-card {
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-soft);
@@ -484,29 +500,23 @@
       margin-top: 14px;
     }
 
-    .entry-card {
-      padding: 18px;
-      background: linear-gradient(180deg, rgba(47, 128, 255, 0.09), rgba(255,255,255,0.97));
-      border: 1px solid rgba(47, 128, 255, 0.14);
+    .metric-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
     }
 
-    .entry-label,
+    .metric-actions .button {
+      min-height: 38px;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+
     .mini-title {
       color: var(--muted);
       font-size: 12px;
       margin-bottom: 8px;
-    }
-
-    .entry-url {
-      padding: 14px 16px;
-      border-radius: var(--radius-md);
-      background: #fff;
-      border: 1px solid rgba(15, 23, 42, 0.06);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.94);
-      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-      font-size: 13px;
-      line-height: 1.75;
-      word-break: break-all;
     }
 
     .mini-grid {
@@ -629,14 +639,15 @@
         <div class="eyebrow">只在这台电脑上打开的本地配置页</div>
         <h1>Codex Phone 配置助手</h1>
         <p class="hero-copy">
-          这个页面专门帮你把手机连接到这台电脑上的 Codex。你不需要理解太多技术细节，只要按步骤选场景、填好 ZeroTier 地址、做一次检测，最后复制手机入口就能用了。
+          这个页面专门帮你把手机连接到这台电脑上的 Codex。你不需要理解太多技术细节，只要先选场景，再按页面给出的下一步操作，最后复制手机入口就能用了。
         </p>
-        <div class="hero-actions">
-          <button class="button primary" id="refreshAllBtn">刷新当前状态</button>
-          <button class="button" id="copyEffectiveBtn">复制推荐手机入口</button>
-          <a class="button" href="/" target="_blank" rel="noreferrer">打开手机聊天页</a>
-        </div>
       </div>
+
+      <section class="card section">
+        <h2 class="section-title">1. 先选你的使用场景</h2>
+        <p class="section-sub">直接按你的真实情况选就行，不用管底层是什么模式。系统会自动帮你映射。</p>
+        <div class="scenario-list" id="scenarioList"></div>
+      </section>
 
       <aside class="card hero-side">
         <div class="metric">
@@ -648,11 +659,10 @@
           <div class="metric-label">现在手机该打开哪个地址</div>
           <div class="metric-value" id="metricUrl">读取中</div>
           <div class="metric-sub">这个地址会自动带上 token，通常直接复制到手机浏览器就行。</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">当前进度</div>
-          <div class="metric-value" id="metricProgress">正在判断</div>
-          <div class="metric-sub" id="metricProgressSub">系统会告诉你下一步最该做什么。</div>
+          <div class="metric-actions">
+            <button class="button success" id="openEffectiveBtn">打开手机入口</button>
+            <button class="button" id="copyEffectiveMainBtn">复制这个入口</button>
+          </div>
         </div>
       </aside>
     </section>
@@ -671,13 +681,7 @@
           </div>
         </section>
 
-        <section class="card section">
-          <h2 class="section-title">1. 先选你的使用场景</h2>
-          <p class="section-sub">直接按你的真实情况选就行，不用管底层是什么模式。系统会自动帮你映射。</p>
-          <div class="scenario-list" id="scenarioList"></div>
-        </section>
-
-        <section class="card section">
+        <section class="card section" id="zerotierConfigSection">
           <h2 class="section-title">2. 配好 ZeroTier 远程地址</h2>
           <p class="section-sub">如果你准备在外面远程访问宿舍电脑，重点就是这里。电脑连上 ZeroTier 后，系统通常能自动识别出可用地址。</p>
           <div class="field-list">
@@ -708,33 +712,15 @@
           </div>
         </section>
 
-        <section class="card section">
-          <h2 class="section-title">3. 看结果和修复建议</h2>
-          <p class="section-sub">这里不会只告诉你成功或失败，还会尽量告诉你下一步应该怎么修。</p>
-          <div class="status-box" id="zerotierCheckBox"></div>
-        </section>
       </div>
 
       <div class="stack">
-        <section class="card section">
-          <h2 class="section-title">最终手机入口</h2>
-          <p class="section-sub">如果你只关心手机最后应该打开哪个地址，就看这里。</p>
-          <div class="entry-card">
-            <div class="entry-label">推荐手机入口</div>
-            <div class="entry-url" id="effectiveLinkValue">读取中</div>
-            <div class="hero-actions">
-              <button class="button success" id="openEffectiveBtn">打开手机入口</button>
-              <button class="button" id="copyEffectiveMainBtn">复制这个入口</button>
-            </div>
-          </div>
-        </section>
-
         <section class="card section">
           <h2 class="section-title">你只要记住这三步</h2>
           <div class="list">
             <div class="list-item">
               <div class="list-index">1</div>
-              <div class="list-copy">先确认这台电脑上的 `Codex Phone` 后端已经启动，然后回到这个页面刷新状态。</div>
+              <div class="list-copy">先确认这台电脑上的 `Codex Phone` 后端已经启动，然后打开这个管理页。</div>
             </div>
             <div class="list-item">
               <div class="list-index">2</div>
@@ -742,7 +728,7 @@
             </div>
             <div class="list-item">
               <div class="list-index">3</div>
-              <div class="list-copy">检测通过后，直接复制上面的推荐手机入口到手机浏览器，一般就能马上用了。</div>
+              <div class="list-copy">页面显示可用入口后，直接复制“现在手机该打开哪个地址”里的地址到手机浏览器。</div>
             </div>
           </div>
         </section>
@@ -758,10 +744,6 @@
             <div class="mini-card">
               <div class="mini-title">局域网状态</div>
               <div class="mini-value" id="lanStatusValue">读取中</div>
-            </div>
-            <div class="mini-card">
-              <div class="mini-title">ZeroTier 状态</div>
-              <div class="mini-value" id="zerotierStatusValue">读取中</div>
             </div>
           </div>
         </section>
@@ -863,7 +845,52 @@
       return "未确定";
     }
 
+    function isRemotePending(access) {
+      const preferredMode = String(access?.mode || "").toLowerCase();
+      return preferredMode === "zerotier" && (!access?.zerotierEnabled || !access?.zerotierLink);
+    }
+
+    function recommendedEntry(access) {
+      if (isRemotePending(access)) {
+        return {
+          ready: false,
+          text: "先配置并启用 ZeroTier 后，这里才会生成远程手机入口。",
+          link: "",
+        };
+      }
+
+      if (String(access?.mode || "").toLowerCase() === "zerotier") {
+        const link = access?.zerotierLink || "";
+        return {
+          ready: Boolean(link),
+          text: textOrFallback(link, "先配置 ZeroTier 地址后再生成远程入口"),
+          link,
+        };
+      }
+
+      const link = access?.effectiveLink || "";
+      return {
+        ready: Boolean(link),
+        text: textOrFallback(link),
+        link,
+      };
+    }
+
     function buildProgress(access, check) {
+      const normalizedMode = String(access?.mode || "auto").toLowerCase();
+      if (normalizedMode === "lan") {
+        return {
+          badge: "可直接使用",
+          title: "下一步：复制局域网手机入口",
+          subtitle: "你选择的是同一 Wi-Fi 场景，不需要配置 ZeroTier。确认手机和电脑在同一个路由器下面后，直接复制推荐手机入口。",
+          tips: [
+            "如果手机打不开，先确认手机和电脑连的是同一个 Wi-Fi。",
+            "如果电脑防火墙弹出提示，允许这个程序在专用网络里访问。",
+          ],
+          tone: "ok",
+        };
+      }
+
       if (!access?.zerotierIp) {
         return {
           badge: "待填写",
@@ -896,7 +923,7 @@
           title: "下一步：检测这条 ZeroTier 地址",
           subtitle: "你已经填好了地址，但系统还没有确认它能不能访问。",
           tips: [
-            "点一次“保存并检测”就够了，系统会自动给出结果和修复建议。",
+            "点一次“保存并检测”就够了，系统会自动确认这条地址是否可用。",
             "如果你刚改过 ZeroTier 网络或防火墙，也建议重新检测一次。",
           ],
           tone: "warn",
@@ -919,21 +946,13 @@
       return {
         badge: "已就绪",
         title: "现在可以直接把手机连上来了",
-        subtitle: "检测已经通过。你现在只需要复制右侧的推荐手机入口，或者直接打开手机入口。",
+        subtitle: "检测已经通过。你现在只需要复制下面的推荐手机入口，或者直接打开手机入口。",
         tips: [
-          "后面手机再访问时，优先用右侧这个推荐手机入口。",
+          "后面手机再访问时，优先用页面给出的推荐手机入口。",
           "如果哪天 ZeroTier 地址变了，回来重新保存并检测一次就行。",
         ],
         tone: "ok",
       };
-    }
-
-    function statusLabel(access) {
-      if (!access?.zerotierIp) return "未配置";
-      if (!access?.zerotierEnabled) return "已保存，未启用";
-      if (state.zerotierCheck?.reachable) return "可用";
-      if (state.zerotierCheck && !state.zerotierCheck.reachable) return "检测失败";
-      return "待检测";
     }
 
     function renderGuide(access) {
@@ -941,11 +960,16 @@
       document.getElementById("guideBadge").textContent = progress.badge;
       document.getElementById("guideTitle").textContent = progress.title;
       document.getElementById("guideCopy").textContent = progress.subtitle;
-      document.getElementById("metricProgress").textContent = progress.badge;
-      document.getElementById("metricProgressSub").textContent = progress.subtitle;
 
       const tipsWrap = document.getElementById("guideTips");
       tipsWrap.innerHTML = progress.tips.map((tip) => `<div class="tip">${tip}</div>`).join("");
+    }
+
+    function renderZeroTierConfigVisibility(access) {
+      const section = document.getElementById("zerotierConfigSection");
+      if (!section) return;
+      const mode = String(access?.mode || "").toLowerCase();
+      section.classList.toggle("is-hidden", mode === "lan");
     }
 
     function renderScenarios() {
@@ -992,6 +1016,7 @@
 
     function renderZeroTierCheck(check = null) {
       const box = document.getElementById("zerotierCheckBox");
+      if (!box) return;
 
       if (!check) {
         box.className = "status-box warn";
@@ -1054,12 +1079,6 @@
       return `<strong>可用</strong><br>${url}`;
     }
 
-    function formatZeroTierStatus(access) {
-      const label = statusLabel(access);
-      const url = access?.zerotierUrl ? access.zerotierUrl : "还没有配置 ZeroTier 地址";
-      return `<strong>${label}</strong><br>${url}`;
-    }
-
     function syncScenarioFromMode(mode) {
       const normalized = String(mode || "auto").toLowerCase();
       if (normalized === "lan") state.scenario = "wifi";
@@ -1073,24 +1092,34 @@
 
       const preferredMode = modeLabel(access.mode);
       const effectiveMode = modeLabel(access.effectiveMode);
-      document.getElementById("metricMode").textContent = effectiveMode;
-      document.getElementById("metricModeSub").textContent = `你的手动偏好是 ${preferredMode}，系统当前实际给手机使用的是 ${effectiveMode}。`;
-      document.getElementById("metricUrl").textContent = textOrFallback(access.effectiveLink);
+      const entry = recommendedEntry(access);
+
+      if (isRemotePending(access)) {
+        document.getElementById("metricMode").textContent = "ZeroTier 远程未配置";
+        document.getElementById("metricModeSub").textContent = "你选择了远程模式，但还没有配置可用的 ZeroTier 入口，所以这里不会推荐局域网地址。";
+      } else {
+        document.getElementById("metricMode").textContent = effectiveMode;
+        document.getElementById("metricModeSub").textContent = `你的手动偏好是 ${preferredMode}，系统当前实际给手机使用的是 ${effectiveMode}。`;
+      }
+
+      document.getElementById("metricUrl").textContent = entry.text;
       document.getElementById("metricTokenMirror").textContent = state.bootstrap?.token || "读取中";
 
       document.getElementById("effectiveModeBadge").innerHTML = `<strong>${effectiveMode}</strong><br>手动偏好：${preferredMode}`;
       document.getElementById("lanStatusValue").innerHTML = formatLanStatus(access);
-      document.getElementById("zerotierStatusValue").innerHTML = formatZeroTierStatus(access);
 
-      document.getElementById("effectiveLinkValue").textContent = textOrFallback(access.effectiveLink);
-      document.getElementById("effectiveLinkMini").textContent = textOrFallback(access.effectiveLink);
+      document.getElementById("effectiveLinkMini").textContent = entry.text;
       document.getElementById("lanLinkValue").textContent = textOrFallback(access.lanLink);
       document.getElementById("zerotierLinkValue").textContent = textOrFallback(access.zerotierLink);
+
+      document.getElementById("copyEffectiveMainBtn").disabled = !entry.ready;
+      document.getElementById("openEffectiveBtn").disabled = !entry.ready;
 
       document.getElementById("zerotierIpInput").value = access.zerotierIp || "";
       document.getElementById("zerotierPortInput").value = access.zerotierPort || 8787;
       document.getElementById("zerotierEnabledInput").value = String(Boolean(access.zerotierEnabled));
 
+      renderZeroTierConfigVisibility(access);
       renderDetectedIps(access);
       renderZeroTierCheck(state.zerotierCheck);
       renderGuide(access);
@@ -1136,7 +1165,7 @@
       if (state.zerotierCheck?.reachable) {
         showToast("ZeroTier 检测通过");
       } else {
-        showToast("检测失败，请看修复建议");
+        showToast("检测失败，请检查 ZeroTier 配置");
       }
     }
 
@@ -1145,8 +1174,13 @@
     }
 
     async function copyEffectiveLink() {
+      const entry = recommendedEntry(state.access);
+      if (!entry.ready) {
+        showToast("请先配置 ZeroTier 远程入口");
+        return;
+      }
       try {
-        await copyText(state.access?.effectiveLink || "");
+        await copyText(entry.link);
         showToast("推荐手机入口已复制");
       } catch {
         showToast("复制失败，请手动复制");
@@ -1154,16 +1188,15 @@
     }
 
     function openEffectiveLink() {
-      const url = state.access?.effectiveLink || "";
+      const entry = recommendedEntry(state.access);
+      const url = entry.link;
       if (!url) {
-        showToast("当前还没有可打开的手机入口");
+        showToast("请先配置 ZeroTier 远程入口");
         return;
       }
       window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    document.getElementById("refreshAllBtn").addEventListener("click", refreshAccess);
-    document.getElementById("copyEffectiveBtn").addEventListener("click", copyEffectiveLink);
     document.getElementById("copyEffectiveMainBtn").addEventListener("click", copyEffectiveLink);
     document.getElementById("openEffectiveBtn").addEventListener("click", openEffectiveLink);
     document.getElementById("saveZeroTierBtn").addEventListener("click", saveZeroTier);
