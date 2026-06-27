@@ -143,6 +143,7 @@ http://127.0.0.1:8787/admin
 ```text
 http://192.168.1.23:8787/?token=xxxxxxxx
 ```
+<img width="1254" height="650" alt="dc1b8257-e29a-46bf-9bbe-27e7ea1c3331" src="https://github.com/user-attachments/assets/80939ed4-fe42-499a-9c9c-7866a2c9cf55" />
 
 
 ### 4. 在手机浏览器打开这个入口
@@ -211,10 +212,16 @@ iPhone / iPad 用户需要安装 `ZeroTier One`。
 ```text
 https://my.zerotier.com/
 ```
+<img width="1254" height="418" alt="db5eec43-3299-4e04-ad5d-7c47d9dff403" src="https://github.com/user-attachments/assets/b93d564e-b6ce-4b2d-ab37-9fb756aaac12" />
 
-2. 注册或登录账号。
-3. 进入 `Networks` 页面。
-4. 点击 `Create A Network`。
+2. 注册或登录账号。<img width="1254" height="776" alt="1c2f2b11-0563-4aae-bcfd-d21b768c0f6d" src="https://github.com/user-attachments/assets/b37b861f-453e-4ce3-a410-427bb9146eb6" />
+
+3. 进入 `Networks` 页面。<img width="1254" height="140" alt="8780b08b-11ab-4ad1-baf7-589e82dcdb1e" src="https://github.com/user-attachments/assets/689007e7-02d6-47e8-b740-95344c2cecbd" />
+<img width="1461" height="1031" alt="8cc87ef5-dc5d-4bd8-9e03-4ba216b55b07" src="https://github.com/user-attachments/assets/cdde9c8b-9f8e-4a6f-9e8e-571373619d89" />
+
+
+4. 点击 `Create A Network`(如果是第一次注册使用，网站会给你自动完成本操作)。<img width="1254" height="450" alt="83810cc2-4be9-4abd-a463-59e0bbaa5c8e" src="https://github.com/user-attachments/assets/406426d5-1876-4987-b6d0-7fca62fc005d" />
+
 5. 创建后复制 `Network ID`。
 
 `Network ID` 通常长这样：
@@ -230,7 +237,8 @@ https://my.zerotier.com/
 1. 在 Windows 电脑上安装并启动 ZeroTier。
 2. 找到右下角托盘里的 ZeroTier 图标。
 3. 右键 ZeroTier 图标。
-4. 选择 `Join New Network...`。
+4. 选择 `Join New Network...`。<img width="1254" height="600" alt="7f178d49-0c89-48a4-b97d-eed29fb4bf9a" src="https://github.com/user-attachments/assets/a25a78b0-d794-41bc-af26-50104f59a27f" />
+
 5. 粘贴刚刚复制的 `Network ID`。
 6. 点击确认。
 
@@ -247,7 +255,8 @@ https://my.zerotier.com/
 2. 打开刚才创建的网络。
 3. 往下找到 `Members` 列表。
 4. 找到刚刚加入的 Windows 电脑。
-5. 勾选 `Auth` 或 `Authorized`。
+5. 勾选 `Auth` 或 `Authorized`。<img width="1254" height="300" alt="73f7c02a-d20f-4c10-a3ac-4bb43e29172e" src="https://github.com/user-attachments/assets/7dd8826f-bc54-4a2e-be61-af231ca2b3f3" />
+
 6. 可以给电脑改个名字，例如：
 
 ```text
@@ -276,10 +285,14 @@ dorm-windows-pc
 
 1. 安装 `ZeroTier One` APK。
 2. 打开 `ZeroTier One`。
-3. 点击添加网络，通常是 `+`。
-4. 填入同一个 `Network ID`。
+3. 点击添加网络。<img width="1254" height="2340" alt="c94b100d-ca27-49d7-bb9e-4225b534771a" src="https://github.com/user-attachments/assets/3402e5d4-e942-4d81-a975-86c2e45dce9b" />
+
+
+4. 填入同一个 `Network ID`。<img width="1254" height="2340" alt="d8ea6769c976f8f1716edfcec3d5bc09" src="https://github.com/user-attachments/assets/5814be23-12db-4dde-902d-86a96b20a884" />
+
 5. 保存。
-6. 打开这个网络的开关。
+6. 打开这个网络的开关。<img width="1080" height="1705" alt="3a38aafa-52d3-4e0c-9768-0576da1683a3" src="https://github.com/user-attachments/assets/2c975f8c-9d4a-4369-ac6e-83abd1262ddb" />
+
 7. 如果系统提示创建 VPN 连接，选择允许。
 
 Android 上 ZeroTier 会以 VPN 的形式运行，这是正常的。这里的 VPN 不是用来浏览外网，而是用来创建虚拟局域网。
@@ -300,7 +313,8 @@ Android 上 ZeroTier 会以 VPN 的形式运行，这是正常的。这里的 VP
 1. 回到 ZeroTier Central。
 2. 打开你的网络。
 3. 在 `Members` 列表里找到手机。
-4. 勾选 `Auth` 或 `Authorized`。
+4. 勾选 `Auth` 或 `Authorized`。<img width="1254" height="300" alt="73f7c02a-d20f-4c10-a3ac-4bb43e29172e" src="https://github.com/user-attachments/assets/7dd8826f-bc54-4a2e-be61-af231ca2b3f3" />
+
 5. 可以给手机改个名字，例如：
 
 ```text
@@ -334,7 +348,8 @@ ZeroTier Network ID
 http://127.0.0.1:8787/admin
 ```
 
-3. 选择远程 / ZeroTier 场景。
+3. 选择远程 / ZeroTier 场景。<img width="1254" height="500" alt="3806d1cf-aaeb-4f17-9a81-f69e027e2ca8" src="https://github.com/user-attachments/assets/dfccc61b-a80c-4a30-8ec7-7ad244b4f21a" />
+
 4. 在 `ZeroTier IP` 里填写电脑的 ZeroTier IP，例如：
 
 ```text
@@ -346,6 +361,7 @@ http://127.0.0.1:8787/admin
 ```text
 8787
 ```
+<img width="1254" height="500" alt="994d86c1-febe-4656-afcc-b973bab01bc9" src="https://github.com/user-attachments/assets/c8511ef2-59c9-4fe0-838f-9f80f220be7d" />
 
 6. 选择立即启用。
 7. 点击保存并检测。
