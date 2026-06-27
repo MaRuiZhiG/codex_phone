@@ -78,6 +78,36 @@ def _dedupe_keep_order(values: list[str]) -> list[str]:
     return ordered
 
 
+def _local_ipv4_addresses() -> set[str]:
+    addresses = {"127.0.0.1"}
+
+    try:
+        result = subprocess.run(
+            ["ipconfig"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="ignore",
+            timeout=5,
+        )
+        for match in re.finditer(r"(?<!\d)(\d{1,3}(?:\.\d{1,3}){3})(?!\d)", result.stdout or ""):
+            raw_ip = match.group(1)
+            try:
+                addresses.add(str(ipaddress.ip_address(raw_ip)))
+            except ValueError:
+                continue
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+    try:
+        for item in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            addresses.add(item[4][0])
+    except OSError:
+        pass
+
+    return addresses
+
+
 @dataclass
 class AccessManager:
     settings: Settings
@@ -297,6 +327,21 @@ class AccessManager:
         query = urlencode({"token": self.settings.token})
         health_url = f"{zerotier_url}/health?{query}"
         result["healthUrl"] = health_url
+        parsed = urlparse(zerotier_url)
+        host = parsed.hostname or ""
+        port = int(parsed.port or self.settings.port)
+
+        if host in _local_ipv4_addresses() and port == int(self.settings.port):
+            try:
+                with socket.create_connection((host, port), timeout=2):
+                    result["statusCode"] = 200
+                    result["reachable"] = True
+                    result["ok"] = True
+            except OSError as exc:
+                result["error"] = str(exc)
+            status["checkedAt"] = checked_at
+            status["zerotierCheck"] = result
+            return status
 
         try:
             req = Request(health_url, method="GET")

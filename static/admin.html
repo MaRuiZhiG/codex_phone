@@ -381,6 +381,32 @@
       line-height: 1.7;
     }
 
+    .action-status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(47, 128, 255, 0.07);
+      border: 1px solid rgba(47, 128, 255, 0.12);
+    }
+
+    .action-status.ok {
+      background: var(--green-soft);
+      border-color: rgba(22, 150, 107, 0.16);
+      color: #0f7f58;
+    }
+
+    .action-status.warn {
+      background: var(--amber-soft);
+      border-color: rgba(196, 121, 18, 0.16);
+      color: #8a5a08;
+    }
+
+    .action-status.error {
+      background: var(--red-soft);
+      border-color: rgba(201, 60, 60, 0.16);
+      color: #a53b3b;
+    }
+
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -696,10 +722,10 @@
                 <input class="input" id="zerotierPortInput" type="number" min="1" max="65535" value="8787">
               </div>
               <div class="field">
-                <label for="zerotierEnabledInput">保存后是否立即启用</label>
+                <label for="zerotierEnabledInput">保存后怎么使用这个地址</label>
                 <select class="select" id="zerotierEnabledInput">
-                  <option value="true">立即启用</option>
-                  <option value="false">先只保存</option>
+                  <option value="true">启用为远程入口（推荐）</option>
+                  <option value="false">只保存，不作为入口</option>
                 </select>
               </div>
             </div>
@@ -710,6 +736,7 @@
             <button class="button" id="checkZeroTierBtn">重新检测 ZeroTier</button>
             <button class="button" id="fillDetectedBtn">填入自动识别地址</button>
           </div>
+          <div class="help action-status" id="zerotierActionStatus">配置后点击保存并检测，系统会在这里显示检测结果。</div>
         </section>
 
       </div>
@@ -908,10 +935,10 @@
         return {
           badge: "待启用",
           title: "地址已经保存，但还没有启用",
-          subtitle: "如果这条地址就是你要给手机用的入口，建议改成“立即启用”后再保存一次。",
+          subtitle: "检测通过只说明地址能访问；只有启用后，它才会成为手机推荐入口。",
           tips: [
-            "不启用也能先保存，但系统不会把它当成当前推荐入口。",
-            "启用后再做检测，手机入口才会优先切到 ZeroTier。",
+            "把下拉框改成“启用为远程入口（推荐）”，再点一次保存并检测。",
+            "如果只是想记下这个地址，不启用也可以，但手机入口不会切到 ZeroTier。",
           ],
           tone: "warn",
         };
@@ -1005,6 +1032,8 @@
         ? detected.map((ip) => `<div class="chip">${ip} <button type="button" data-ip="${ip}">填入</button></div>`).join("")
         : `<div class="chip">暂时还没识别到 ZeroTier IP</div>`;
 
+      document.getElementById("fillDetectedBtn").disabled = !detected.length;
+
       wrap.querySelectorAll("button[data-ip]").forEach((button) => {
         button.addEventListener("click", () => {
           document.getElementById("zerotierIpInput").value = button.dataset.ip || "";
@@ -1012,6 +1041,56 @@
           showToast("已填入自动识别的 ZeroTier 地址");
         });
       });
+    }
+
+    function setZeroTierBusy(isBusy, message = "") {
+      document.getElementById("saveZeroTierBtn").disabled = isBusy;
+      document.getElementById("checkZeroTierBtn").disabled = isBusy;
+      if (!isBusy) {
+        document.getElementById("fillDetectedBtn").disabled = !(state.access?.zerotierIps || []).length;
+      } else {
+        document.getElementById("fillDetectedBtn").disabled = true;
+      }
+      if (message) {
+        setZeroTierActionStatus(message, "warn");
+      }
+    }
+
+    function setZeroTierActionStatus(message, tone = "") {
+      const box = document.getElementById("zerotierActionStatus");
+      if (!box) return;
+      box.className = `help action-status${tone ? ` ${tone}` : ""}`;
+      box.textContent = message;
+    }
+
+    function renderZeroTierActionStatus(access, check = null) {
+      if (!access?.zerotierIp) {
+        setZeroTierActionStatus("还没有填写 ZeroTier IP。先填入电脑的 ZeroTier IP，再保存并检测。");
+        return;
+      }
+
+      if (!check) {
+        setZeroTierActionStatus("ZeroTier 地址已填写，但还没有检测。点击保存并检测，系统会确认这个地址能不能访问。", "warn");
+        return;
+      }
+
+      if (check.reachable) {
+        if (!access?.zerotierEnabled) {
+          setZeroTierActionStatus(`检测通过：${check.baseUrl} 可以访问。但你选择的是“只保存，不作为入口”，所以手机入口还没有切到 ZeroTier。`, "warn");
+          return;
+        }
+        setZeroTierActionStatus(`检测通过：${check.baseUrl} 可以访问。`, "ok");
+        return;
+      }
+
+      const detail = String(check.error || (check.statusCode ? `HTTP ${check.statusCode}` : "未连通"));
+      let advice = "请检查 ZeroTier IP、端口和 Windows 防火墙。";
+      if (/timed out|超时/i.test(detail)) {
+        advice = "检测超时。通常是手机和电脑没有真正进入同一个 ZeroTier 网络，或电脑防火墙拦住了 8787 端口。";
+      } else if (/10061|refused|拒绝|connection refused/i.test(detail)) {
+        advice = "端口被拒绝。通常说明 Codex Phone 没有在这个地址的 8787 端口上运行。";
+      }
+      setZeroTierActionStatus(`检测失败：${detail}。${advice}`, "error");
     }
 
     function renderZeroTierCheck(check = null) {
@@ -1122,6 +1201,7 @@
       renderZeroTierConfigVisibility(access);
       renderDetectedIps(access);
       renderZeroTierCheck(state.zerotierCheck);
+      renderZeroTierActionStatus(access, state.zerotierCheck);
       renderGuide(access);
       syncScenarioFromMode(access.mode);
       renderScenarios();
@@ -1143,29 +1223,45 @@
     }
 
     async function saveZeroTier() {
-      const data = await request("/admin/access/zerotier/config", {
-        method: "POST",
-        body: JSON.stringify({
-          zerotierIp: document.getElementById("zerotierIpInput").value.trim(),
-          zerotierPort: Number(document.getElementById("zerotierPortInput").value || 8787),
-          enabled: document.getElementById("zerotierEnabledInput").value === "true",
-        }),
-      });
-      applyAccess(data.access);
-      showToast("配置已保存，正在检测");
-      await checkZeroTier();
+      try {
+        setZeroTierBusy(true, "正在保存 ZeroTier 配置...");
+        const data = await request("/admin/access/zerotier/config", {
+          method: "POST",
+          body: JSON.stringify({
+            zerotierIp: document.getElementById("zerotierIpInput").value.trim(),
+            zerotierPort: Number(document.getElementById("zerotierPortInput").value || 8787),
+            enabled: document.getElementById("zerotierEnabledInput").value === "true",
+          }),
+        });
+        applyAccess(data.access);
+        showToast("配置已保存，正在检测");
+        await checkZeroTier();
+      } catch (error) {
+        setZeroTierActionStatus(error.message || "保存失败，请检查配置。", "error");
+        showToast(error.message || "保存失败");
+      } finally {
+        setZeroTierBusy(false);
+      }
     }
 
     async function checkZeroTier() {
-      const data = await request("/admin/access/zerotier/check", {
-        method: "POST",
-        body: "{}",
-      });
-      applyAccess(data.access);
-      if (state.zerotierCheck?.reachable) {
-        showToast("ZeroTier 检测通过");
-      } else {
-        showToast("检测失败，请检查 ZeroTier 配置");
+      try {
+        setZeroTierBusy(true, "正在检测 ZeroTier 地址，请稍等...");
+        const data = await request("/admin/access/zerotier/check", {
+          method: "POST",
+          body: "{}",
+        });
+        applyAccess(data.access);
+        if (state.zerotierCheck?.reachable) {
+          showToast("ZeroTier 检测通过");
+        } else {
+          showToast("检测失败，请看页面提示");
+        }
+      } catch (error) {
+        setZeroTierActionStatus(error.message || "检测失败，请检查 ZeroTier 配置。", "error");
+        showToast(error.message || "检测失败");
+      } finally {
+        setZeroTierBusy(false);
       }
     }
 

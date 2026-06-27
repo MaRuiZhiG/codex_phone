@@ -33,7 +33,7 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 ChangesAssociations=no
 CloseApplications=yes
@@ -55,4 +55,9 @@ Name: "{group}\Uninstall Codex Phone"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\Codex Phone"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\app-icon.ico"; Tasks: desktopicon
 
 [Run]
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Codex Phone 8787"""; Flags: runhidden waituntilterminated
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Codex Phone 8787"" dir=in action=allow protocol=TCP localport=8787 profile=any"; Flags: runhidden waituntilterminated
 Filename: "{app}\{#MyAppExeName}"; Description: "Launch Codex Phone"; Flags: nowait postinstall skipifsilent
+
+[UninstallRun]
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Codex Phone 8787"""; Flags: runhidden waituntilterminated
