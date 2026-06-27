@@ -25,7 +25,8 @@ Codex Phone
 ## 先看这个：我应该选哪种连接方式？
 
 Codex Phone 有两种常见用法。
-<img width="650" height="325" alt="f10b9fdf-0193-4f2b-95cc-1d90e2c21d36" src="https://github.com/user-attachments/assets/7a617f26-47ce-46c6-b780-2cf06ae01b29" />
+
+<img width="1254" height="650" alt="f10b9fdf-0193-4f2b-95cc-1d90e2c21d36" src="https://github.com/user-attachments/assets/7a617f26-47ce-46c6-b780-2cf06ae01b29" />
 
 ### 方式一：手机和电脑在同一个 Wi-Fi 下
 
@@ -100,6 +101,10 @@ Codex Phone
 http://127.0.0.1:8787/admin
 ```
 
+<img width="1254" height="1241" alt="b82e38af-8998-4e2b-908f-474bed38d0ce" src="https://github.com/user-attachments/assets/8f61a4a3-dd00-469e-a762-c3d3b6942ede" />
+
+
+
 ## 第一次使用：同 Wi-Fi 模式
 
 这是最推荐的入门方式。
@@ -115,6 +120,7 @@ http://127.0.0.1:8787/admin
 
 不要让手机使用流量，也不要让手机连到另一个 Wi-Fi。
 
+
 ### 2. 打开 Codex Phone 管理页
 
 在电脑上打开：
@@ -122,6 +128,7 @@ http://127.0.0.1:8787/admin
 ```text
 http://127.0.0.1:8787/admin
 ```
+<img width="1254" height="1241" alt="b82e38af-8998-4e2b-908f-474bed38d0ce" src="https://github.com/user-attachments/assets/8f61a4a3-dd00-469e-a762-c3d3b6942ede" />
 
 ### 3. 选择使用场景
 
@@ -130,12 +137,13 @@ http://127.0.0.1:8787/admin
 ```text
 我和电脑就在同一个 Wi-Fi 里
 ```
-
+<img width="1254" height="650" alt="f10b9fdf-0193-4f2b-95cc-1d90e2c21d36" src="https://github.com/user-attachments/assets/7a617f26-47ce-46c6-b780-2cf06ae01b29" />
 页面会自动生成一个手机入口，类似：
 
 ```text
 http://192.168.1.23:8787/?token=xxxxxxxx
 ```
+
 
 ### 4. 在手机浏览器打开这个入口
 
