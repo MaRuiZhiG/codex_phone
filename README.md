@@ -9,7 +9,7 @@
 - 读取本地会话和状态日志
 - 再把结果同步回手机网页
 
-这个项目的思路和 `codex-mini` 类似，但实现方式完全针对 Windows 重写：
+
 
 - 后端使用 `FastAPI + Uvicorn + Python`
 - 桌面自动化基于 Windows GUI 控制
