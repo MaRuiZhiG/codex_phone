@@ -10,7 +10,11 @@ a = Analysis(
     ["app/launcher.py"],
     pathex=[str(ROOT)],
     binaries=[],
-    datas=[("static", "static")],
+    datas=[
+        ("static", "static"),
+        ("assets/app-icon.ico", "assets"),
+        ("assets/app-icon.png", "assets"),
+    ],
     hiddenimports=[
         "uvicorn.lifespan.on",
         "uvicorn.lifespan.off",
@@ -20,6 +24,7 @@ a = Analysis(
         "uvicorn.protocols.websockets.websockets_impl",
         "uvicorn.loops.auto",
         "PIL._tkinter_finder",
+        "pystray._win32",
     ],
     hookspath=[],
     hooksconfig={},

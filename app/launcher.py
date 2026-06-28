@@ -13,6 +13,7 @@ import uvicorn
 
 from app.config import load_settings
 from app.logging_setup import configure_logging
+from app.tray import create_tray_icon, tray_enabled
 
 
 def _open_admin_page(host: str, port: int) -> None:
@@ -46,7 +47,7 @@ def main() -> None:
     if os.getenv("CODEX_PHONE_NO_BROWSER", "").strip() not in {"1", "true", "yes"}:
         threading.Thread(target=_open_admin_page, args=(settings.host, settings.port), daemon=True).start()
 
-    uvicorn.run(
+    config = uvicorn.Config(
         fastapi_app,
         host=settings.host,
         port=settings.port,
@@ -54,6 +55,23 @@ def main() -> None:
         access_log=False,
         log_config=None,
     )
+    server = uvicorn.Server(config)
+
+    if not tray_enabled():
+        server.run()
+        return
+
+    server_thread = threading.Thread(target=server.run, name="codex-phone-server", daemon=True)
+    server_thread.start()
+
+    tray_icon = create_tray_icon(settings, lambda: setattr(server, "should_exit", True))
+
+    def _stop_tray_when_server_exits() -> None:
+        server_thread.join()
+        tray_icon.stop()
+
+    threading.Thread(target=_stop_tray_when_server_exits, name="codex-phone-tray-watch", daemon=True).start()
+    tray_icon.run()
 
 
 if __name__ == "__main__":
